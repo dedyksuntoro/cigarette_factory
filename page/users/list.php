@@ -1,10 +1,11 @@
 <?php
-require_once '../../config/db.php';
-require_once '../templates/header.php';
+session_start();
+require_once __DIR__.'/../../config/db.php';
+require_once __DIR__.'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../page/auth/login.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
@@ -121,7 +122,7 @@ $total_pages = ceil($total_users / $limit);
             </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="list.php" class="btn btn-secondary mt-3">Reset</a>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Pengguna -->
@@ -148,8 +149,8 @@ $total_pages = ceil($total_users / $limit);
                         <td><?php echo htmlspecialchars($user['role']); ?></td>
                         <td><?php echo htmlspecialchars($user['created_at']); ?></td>
                         <td>
-                            <a href="edit.php?id=<?php echo $user['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="delete.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/edit.php?id=<?php echo $user['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/delete.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
