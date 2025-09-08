@@ -1,16 +1,16 @@
 <?php
-require_once '../../config/db.php';
-require_once '../templates/header.php';
+require_once __DIR__'/../../config/db.php';
+require_once __DIR__'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
-    header('Location: ../../page/auth/login.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
 // Ambil ID hasil dari URL
 if (!isset($_GET['id'])) {
-    header('Location: list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/production_results/list.php');
     exit();
 }
 $result_id = $_GET['id'];
@@ -21,7 +21,7 @@ $stmt->execute([$result_id]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$result) {
-    header('Location: list.php');
+    header('Location: '.$_['BASE_URL'].'/page/production_results/list.php');
     exit();
 }
 
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
         $stmt->execute([$_SESSION['user_id'], "Mengedit hasil produksi untuk rencana ID " . ($plan_id ?? 'kosong')]);
 
-        header('Location: list.php');
+        header('Location: '.$_ENV['BASE_URL'].'/page/production_results/list.php');
         exit();
     } catch (PDOException $e) {
         $error = "Gagal mengedit hasil produksi: " . $e->getMessage();
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" value="<?php echo htmlspecialchars($result['actual_quantity']); ?>" required>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
-        <a href="list.php" class="btn btn-secondary">Batal</a>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary">Batal</a>
     </form>
 </div>
 
