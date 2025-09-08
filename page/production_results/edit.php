@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__'/../../config/db.php';
-require_once __DIR__'/../templates/header.php';
+require_once __DIR__.'/../../config/db.php';
+require_once __DIR__.'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
