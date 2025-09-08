@@ -80,7 +80,7 @@ $role = $_SESSION['role'];
             <?php } ?>
             <?php if (in_array($role, ['admin', 'gudang'])) { ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manajemen Bahan Baku</a>
+                    <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/materials/list.php">Manajemen Bahan Baku</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Manajemen Barang Jadi</a>
