@@ -1,16 +1,16 @@
 <?php
 session_start();
-require_once '../../config/db.php';
+require_once __DIR__.'/../../config/db.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../page/auth/login.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
 // Ambil ID pengguna dari URL
 if (!isset($_GET['id'])) {
-    header('Location: list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/users/list.php');
     exit();
 }
 $user_id = $_GET['id'];
@@ -28,7 +28,7 @@ try {
     $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
     $stmt->execute([$_SESSION['user_id'], "Menghapus pengguna: " . ($user['username'] ?? 'ID ' . $user_id)]);
 
-    header('Location: list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/users/list.php');
     exit();
 } catch (PDOException $e) {
     echo "Gagal menghapus pengguna: " . $e->getMessage();
