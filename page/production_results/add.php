@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" required>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_result/list.php" class="btn btn-secondary">Batal</a>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary">Batal</a>
     </form>
 </div>
 
