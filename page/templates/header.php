@@ -83,7 +83,7 @@ $role = $_SESSION['role'];
                     <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/materials/list.php">Manajemen Bahan Baku</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manajemen Barang Jadi</a>
+                    <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php">Manajemen Barang Jadi</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Pergerakan Stok</a>
