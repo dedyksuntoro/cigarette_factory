@@ -1,0 +1,156 @@
+<?php
+require_once '../../config/db.php';
+require_once '../templates/header.php';
+
+// Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
+    header('Location: ../../page/auth/login.php');
+    exit();
+}
+
+// Catat log aktivitas akses halaman
+$stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
+$stmt->execute([$_SESSION['user_id'], "Mengakses daftar perencanaan produksi"]);
+
+// Proses filter dan paginasi
+$filter_plan_date = $_GET['plan_date'] ?? '';
+$filter_username = $_GET['username'] ?? '';
+$filter_target_quantity = $_GET['target_quantity'] ?? '';
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10; // Jumlah rencana per halaman
+$offset = ($page - 1) * $limit;
+
+// Bangun query dengan filter
+$query = "SELECT pp.id, pp.created_by, u.username, pp.plan_date, pp.target_quantity, pp.created_at 
+          FROM production_plans pp 
+          LEFT JOIN users u ON pp.created_by = u.id 
+          WHERE 1=1";
+$params = [];
+
+if ($filter_plan_date) {
+    $query .= " AND pp.plan_date = ?";
+    $params[] = $filter_plan_date;
+}
+if ($filter_username) {
+    $query .= " AND u.username LIKE ?";
+    $params[] = '%' . $filter_username . '%';
+}
+if ($filter_target_quantity) {
+    $query .= " AND pp.target_quantity = ?";
+    $params[] = $filter_target_quantity;
+}
+
+$query .= " ORDER BY pp.created_at DESC LIMIT ? OFFSET ?";
+
+// Persiapkan statement
+$stmt = $pdo->prepare($query);
+
+// Ikat parameter filter
+$param_count = 1;
+foreach ($params as $param) {
+    $stmt->bindValue($param_count, $param, PDO::PARAM_STR);
+    $param_count++;
+}
+
+// Ikat parameter LIMIT dan OFFSET sebagai integer
+$stmt->bindValue($param_count, (int)$limit, PDO::PARAM_INT);
+$stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
+
+// Eksekusi query
+$stmt->execute();
+$plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Hitung total rencana untuk paginasi
+$count_query = "SELECT COUNT(*) as total FROM production_plans pp LEFT JOIN users u ON pp.created_by = u.id WHERE 1=1";
+$count_params = [];
+if ($filter_plan_date) {
+    $count_query .= " AND pp.plan_date = ?";
+    $count_params[] = $filter_plan_date;
+}
+if ($filter_username) {
+    $count_query .= " AND u.username LIKE ?";
+    $count_params[] = '%' . $filter_username . '%';
+}
+if ($filter_target_quantity) {
+    $count_query .= " AND pp.target_quantity = ?";
+    $count_params[] = $filter_target_quantity;
+}
+$stmt = $pdo->prepare($count_query);
+$stmt->execute($count_params);
+$total_plans = $stmt->fetchColumn();
+$total_pages = ceil($total_plans / $limit);
+?>
+
+<div class="container mt-4">
+    <h1>Perencanaan Produksi</h1>
+    <a href="add.php" class="btn btn-success mb-3">Tambah Rencana Produksi</a>
+
+    <!-- Form Filter -->
+    <form method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="plan_date" class="form-label">Tanggal Rencana</label>
+                <input type="date" class="form-control" id="plan_date" name="plan_date" value="<?php echo htmlspecialchars($filter_plan_date); ?>">
+            </div>
+            <div class="col-md-4">
+                <label for="username" class="form-label">Pembuat Rencana</label>
+                <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($filter_username); ?>">
+            </div>
+            <div class="col-md-4">
+                <label for="target_quantity" class="form-label">Jumlah Target</label>
+                <input type="number" class="form-control" id="target_quantity" name="target_quantity" value="<?php echo htmlspecialchars($filter_target_quantity); ?>">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Filter</button>
+        <a href="list.php" class="btn btn-secondary mt-3">Reset</a>
+    </form>
+
+    <!-- Tabel Rencana Produksi -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Pembuat</th>
+                <th>Tanggal Rencana</th>
+                <th>Jumlah Target</th>
+                <th>Tanggal Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($plans)): ?>
+                <tr><td colspan="6" class="text-center">Tidak ada data rencana produksi.</td></tr>
+            <?php else: ?>
+                <?php foreach ($plans as $plan): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($plan['id']); ?></td>
+                        <td><?php echo htmlspecialchars($plan['username'] ?? 'Tidak terkait'); ?></td>
+                        <td><?php echo htmlspecialchars($plan['plan_date']); ?></td>
+                        <td><?php echo htmlspecialchars($plan['target_quantity']); ?></td>
+                        <td><?php echo htmlspecialchars($plan['created_at']); ?></td>
+                        <td>
+                            <a href="edit.php?id=<?php echo $plan['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="delete.php?id=<?php echo $plan['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus rencana ini?')">Hapus</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <!-- Paginasi -->
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                    <a class="page-link" href="?page=<?php echo $i; ?>&plan_date=<?php echo urlencode($filter_plan_date); ?>&username=<?php echo urlencode($filter_username); ?>&target_quantity=<?php echo urlencode($filter_target_quantity); ?>"><?php echo $i; ?></a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+</div>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
