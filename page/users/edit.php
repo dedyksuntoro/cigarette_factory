@@ -1,16 +1,17 @@
 <?php
-require_once '../../config/db.php';
-require_once '../templates/header.php';
+session_start();
+require_once __DIR__.'/../../config/db.php';
+require_once __DIR__.'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../../page/auth/login.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
 // Ambil ID pengguna dari URL
 if (!isset($_GET['id'])) {
-    header('Location: list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/users/list.php');
     exit();
 }
 $user_id = $_GET['id'];
@@ -21,7 +22,7 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    header('Location: list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/users/list.php');
     exit();
 }
 
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
         $stmt->execute([$_SESSION['user_id'], "Mengedit pengguna: $username"]);
 
-        header('Location: list.php');
+        header('Location: '.$_ENV['BASE_URL'].'/page/users/list.php');
         exit();
     } catch (PDOException $e) {
         $error = "Gagal mengedit pengguna: " . $e->getMessage();
@@ -76,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
-        <a href="list.php" class="btn btn-secondary">Batal</a>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php" class="btn btn-secondary">Batal</a>
     </form>
 </div>
 
