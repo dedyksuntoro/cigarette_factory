@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supe
 
 // Ambil ID hasil dari URL
 if (!isset($_GET['id'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/production_result/list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/production_results/list.php');
     exit();
 }
 $result_id = $_GET['id'];
