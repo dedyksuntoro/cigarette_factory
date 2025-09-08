@@ -23,13 +23,19 @@ $role = $_SESSION['role'];
     <style>
         body {
             min-height: 100vh;
+            display: flex;
+            flex-direction: row;
         }
         .sidebar {
             width: 250px;
             background-color: #343a40;
             color: white;
             padding: 15px;
-            transition: transform 0.3s ease-in-out;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
         .sidebar .nav-link {
             color: white;
@@ -40,6 +46,7 @@ $role = $_SESSION['role'];
         }
         .content {
             flex: 1;
+            margin-left: 250px; /* Sesuaikan dengan lebar sidebar */
             padding: 20px;
         }
         .header {
@@ -47,6 +54,7 @@ $role = $_SESSION['role'];
             color: white;
             padding: 10px 20px;
             margin-bottom: 20px;
+            border-radius: 5px;
         }
         /* Responsif untuk mobile */
         @media (max-width: 768px) {
@@ -56,13 +64,19 @@ $role = $_SESSION['role'];
                 left: 0;
                 height: 100%;
                 transform: translateX(-100%);
-                z-index: 1000;
+                transition: transform 0.3s ease-in-out;
             }
             .sidebar.show {
                 transform: translateX(0);
             }
             .content {
                 margin-left: 0;
+            }
+        }
+        /* Pastikan navbar tetap rapi di desktop */
+        @media (min-width: 769px) {
+            .navbar {
+                display: none; /* Sembunyikan navbar di desktop */
             }
         }
     </style>
@@ -76,7 +90,7 @@ $role = $_SESSION['role'];
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="sidebarMenu">
-                <div class="sidebar d-lg-block">
+                <div class="sidebar">
                     <h4 class="text-center d-none d-lg-block">Cigarette Factory</h4>
                     <hr class="bg-light d-none d-lg-block">
                     <ul class="nav flex-column">
@@ -149,6 +163,18 @@ $role = $_SESSION['role'];
             
             toggler.addEventListener('click', function () {
                 sidebar.classList.toggle('show');
+            });
+
+            // Tutup sidebar saat link di dalamnya diklik (mobile only)
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                        document.querySelector('.navbar-toggler').setAttribute('aria-expanded', 'false');
+                        document.querySelector('#sidebarMenu').classList.remove('show');
+                    }
+                });
             });
         });
     </script>
