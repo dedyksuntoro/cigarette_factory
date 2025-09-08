@@ -1,10 +1,10 @@
 <?php
-require_once '../../config/db.php';
-require_once '../templates/header.php';
+require_once __DIR__.'/../../config/db.php';
+require_once __DIR__.'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
-    header('Location: ../../page/auth/login.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
@@ -84,7 +84,7 @@ $total_pages = ceil($total_results / $limit);
 
 <div class="container mt-4">
     <h1>Hasil Produksi</h1>
-    <a href="add.php" class="btn btn-success mb-3">Tambah Hasil Produksi</a>
+    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/add.php" class="btn btn-success mb-3">Tambah Hasil Produksi</a>
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
@@ -103,7 +103,7 @@ $total_pages = ceil($total_results / $limit);
             </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="list.php" class="btn btn-secondary mt-3">Reset</a>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Hasil Produksi -->
@@ -132,8 +132,8 @@ $total_pages = ceil($total_results / $limit);
                         <td><?php echo $result['efficiency'] !== null ? htmlspecialchars(number_format($result['efficiency'], 2)) : 'N/A'; ?></td>
                         <td><?php echo htmlspecialchars($result['created_at']); ?></td>
                         <td>
-                            <a href="edit.php?id=<?php echo $result['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="delete.php?id=<?php echo $result['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus hasil ini?')">Hapus</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/edit.php?id=<?php echo $result['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/delete.php?id=<?php echo $result['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus hasil ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
