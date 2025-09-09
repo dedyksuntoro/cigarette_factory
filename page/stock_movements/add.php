@@ -1,7 +1,6 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../../config/db.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -9,6 +8,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+// Ambil data untuk dropdown
+$materials = $pdo->query("SELECT id, name FROM materials")->fetchAll(PDO::FETCH_ASSOC);
+$finished_goods = $pdo->query("SELECT id, product_name FROM finished_goods")->fetchAll(PDO::FETCH_ASSOC);
+
+// Proses form jika metode POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type = $_POST['type'];
     $material_id = $_POST['material_id'] ?: null;
@@ -59,9 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Ambil data untuk dropdown
-$materials = $pdo->query("SELECT id, name FROM materials")->fetchAll(PDO::FETCH_ASSOC);
-$finished_goods = $pdo->query("SELECT id, product_name FROM finished_goods")->fetchAll(PDO::FETCH_ASSOC);
+// Sertakan header setelah logika pengalihan selesai
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">

@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once __DIR__.'/../../config/db.php';
-require_once __DIR__.'/../templates/header.php';
 
 // Cek apakah pengguna sudah login dan memiliki peran admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -25,6 +24,10 @@ if (!$movement) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/stock_movements/list.php');
     exit();
 }
+
+// Ambil data untuk dropdown
+$materials = $pdo->query("SELECT id, name FROM materials")->fetchAll(PDO::FETCH_ASSOC);
+$finished_goods = $pdo->query("SELECT id, product_name FROM finished_goods")->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type = $_POST['type'];
@@ -100,9 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Ambil data untuk dropdown
-$materials = $pdo->query("SELECT id, name FROM materials")->fetchAll(PDO::FETCH_ASSOC);
-$finished_goods = $pdo->query("SELECT id, product_name FROM finished_goods")->fetchAll(PDO::FETCH_ASSOC);
+require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
