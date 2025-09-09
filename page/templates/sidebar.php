@@ -31,7 +31,7 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php">Manajemen Barang Jadi</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Pergerakan Stok</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/list.php">Pergerakan Stok</a>
         </li>
     <?php } ?>
     <?php if (in_array($role, ['admin', 'keuangan'])) { ?>
