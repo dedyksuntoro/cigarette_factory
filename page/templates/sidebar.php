@@ -31,18 +31,24 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php">Manajemen Barang Jadi</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/list.php">Kontrol Kualitas</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/list.php">Pergerakan Stok</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/distributions/list.php">Distribusi</a>
         </li>
     <?php } ?>
     <?php if (in_array($role, ['admin', 'keuangan'])) { ?>
         <li class="nav-item">
-            <a class="nav-link" href="#">Faktur</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/invoices/list.php">Faktur</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Pengeluaran</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/list.php">Pengeluaran</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Pendapatan</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/revenues/list.php">Pendapatan</a>
         </li>
     <?php } ?>
     <li class="nav-item">
