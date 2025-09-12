@@ -4,17 +4,6 @@
     <li class="nav-item">
         <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/index.php">Dashboard</a>
     </li>
-    <?php if ($role == 'admin') { ?>
-        <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php">Manajemen Pengguna</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php">Log Aktivitas</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php">Manajemen Karyawan</a>
-        </li>
-    <?php } ?>
     <?php if (in_array($role, ['admin', 'supervisor'])) { ?>
         <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/list.php">Perencanaan Produksi</a>
@@ -49,6 +38,17 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/revenues/list.php">Pendapatan</a>
+        </li>
+    <?php } ?>
+    <?php if ($role == 'admin') { ?>
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php">Manajemen Pengguna</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php">Manajemen Karyawan</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php">Log Aktivitas</a>
         </li>
     <?php } ?>
     <li class="nav-item">
