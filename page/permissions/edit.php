@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update
     exit();
 }
 
-// Ambil ID pengguna dari URL
+// Ambil ID izin pengguna dari URL
 if (!isset($_GET['id'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
