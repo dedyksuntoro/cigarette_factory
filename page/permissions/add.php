@@ -40,7 +40,7 @@ require_once __DIR__.'/../templates/header.php';
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
         <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
+            <label for="description" class="form-label">Deskripsi</label>
             <input type="txt" class="form-control" id="description" name="description" required>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
