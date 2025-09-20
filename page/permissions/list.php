@@ -38,7 +38,6 @@ $query .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
 
 // Persiapkan statement
 $stmt = $pdo->prepare($query);
-var_dump(stmt);
 
 // Ikat parameter filter
 $param_count = 1;
