@@ -98,6 +98,7 @@ require_once __DIR__.'/../templates/header.php';
             <tr>
                 <th>ID</th>
                 <th>Izin Pengguna</th>
+                <th>Deskripsi</th>
                 <th>Tanggal Dibuat</th>
                 <th>Aksi</th>
             </tr>
