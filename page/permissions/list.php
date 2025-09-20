@@ -25,7 +25,7 @@ $query = "SELECT id, name, description, created_at
 $params = [];
 
 if ($filter_izin) {
-    $query .= " AND `name` LIKE ?";
+    $query .= " AND name LIKE ?";
     $params[] = '%' . $filter_izin . '%';
 }
 if ($filter_created_date) {
@@ -33,9 +33,11 @@ if ($filter_created_date) {
     $params[] = $filter_created_date;
 }
 
+
 $query .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
 
 // Persiapkan statement
+var_dump($query);
 $stmt = $pdo->prepare($query);
 
 // Ikat parameter filter
