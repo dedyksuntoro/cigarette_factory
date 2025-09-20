@@ -25,6 +25,7 @@ $username = $_SESSION['username'];
             color: white;
             height: 100vh;
             padding: 15px;
+            overflow-y: auto; /* Add vertical scrollbar when content overflows */
         }
         .sidebar .nav-link {
             color: white;
@@ -38,6 +39,18 @@ $username = $_SESSION['username'];
             color: white;
             padding: 10px 20px;
             margin-bottom: 20px;
+        }
+        /* Ensure sidebar stays fixed in desktop view */
+        @media (min-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 250px; /* Adjust width as needed */
+            }
+            .main-content {
+                margin-left: 250px; /* Match sidebar width to prevent overlap */
+            }
         }
     </style>
 </head>
@@ -73,7 +86,7 @@ $username = $_SESSION['username'];
         </nav>
 
         <!-- Content Area -->
-        <main class="col-md-9 col-lg-10 px-4 py-3">
+        <main class="col-md-9 col-lg-10 px-4 py-3 main-content">
             <div class="header">
                 <span>Selamat datang, <?php echo htmlspecialchars($username); ?></span>
             </div>
