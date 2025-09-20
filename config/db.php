@@ -24,3 +24,11 @@ try {
 } catch (PDOException $e) {
     die("Koneksi database gagal: " . $e->getMessage());
 }
+
+// Fungsi untuk memeriksa apakah pengguna memiliki salah satu dari permissions yang diperlukan
+function hasPermission($userPermissions, $requiredPermissions) {
+    return count(array_intersect($userPermissions, $requiredPermissions)) > 0;
+}
+
+// Ambil permissions dari session
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : [];

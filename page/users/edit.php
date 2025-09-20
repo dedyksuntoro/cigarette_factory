@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__.'/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update_users'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -16,7 +15,7 @@ if (!isset($_GET['id'])) {
 $user_id = $_GET['id'];
 
 // Ambil data pengguna, termasuk password
-$stmt = $pdo->prepare("SELECT id, username, email, role, password FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, username, email, password FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -28,12 +27,11 @@ if (!$user) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $role = $_POST['role'];
     $password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : $user['password'];
 
     try {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role = ?, password = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role, $password, $user_id]);
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?");
+        $stmt->execute([$username, $email, $password, $user_id]);
 
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
@@ -66,16 +64,6 @@ require_once __DIR__.'/../templates/header.php';
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-        </div>
-        <div class="mb-3">
-            <label for="role" class="form-label">Role</label>
-            <select class="form-select" id="role" name="role" required>
-                <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                <option value="supervisor" <?php echo $user['role'] == 'supervisor' ? 'selected' : ''; ?>>Supervisor</option>
-                <option value="operator" <?php echo $user['role'] == 'operator' ? 'selected' : ''; ?>>Operator</option>
-                <option value="gudang" <?php echo $user['role'] == 'gudang' ? 'selected' : ''; ?>>Gudang</option>
-                <option value="keuangan" <?php echo $user['role'] == 'keuangan' ? 'selected' : ''; ?>>Keuangan</option>
-            </select>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php" class="btn btn-secondary">Batal</a>

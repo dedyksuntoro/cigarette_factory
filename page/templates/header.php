@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $username = $_SESSION['username'];
-$role = $_SESSION['role'];
 ?>
 
 <!DOCTYPE html>
@@ -76,5 +75,5 @@ $role = $_SESSION['role'];
         <!-- Content Area -->
         <main class="col-md-9 col-lg-10 px-4 py-3">
             <div class="header">
-                <span>Selamat datang, <?php echo htmlspecialchars($username); ?> (<?php echo $role; ?>)</span>
+                <span>Selamat datang, <?php echo htmlspecialchars($username); ?></span>
             </div>

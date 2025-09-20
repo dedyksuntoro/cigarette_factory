@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_revenues', 'read_revenues', 'update_revenues', 'delete_revenues'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }

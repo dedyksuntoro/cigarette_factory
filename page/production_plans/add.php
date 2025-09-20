@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__.'/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'create_production_plans'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -12,15 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $created_by = $_SESSION['user_id']; // Gunakan user_id dari sesi sebagai created_by
     $plan_date = $_POST['plan_date'];
     $target_quantity = $_POST['target_quantity'];
-
+    
     try {
         $stmt = $pdo->prepare("INSERT INTO production_plans (created_by, plan_date, target_quantity, created_at) VALUES (?, ?, ?, NOW())");
         $stmt->execute([$created_by, $plan_date, $target_quantity]);
-
+        
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
         $stmt->execute([$_SESSION['user_id'], "Menambahkan rencana produksi untuk tanggal $plan_date"]);
-
+        
         header('Location: '.$_ENV['BASE_URL'].'/page/production_plans/list.php');
         exit();
     } catch (PDOException $e) {

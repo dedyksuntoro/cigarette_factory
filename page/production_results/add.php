@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__.'/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'create_production_results'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }

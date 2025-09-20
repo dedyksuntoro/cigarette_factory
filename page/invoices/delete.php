@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['delete_all', 'delete_invoices'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }

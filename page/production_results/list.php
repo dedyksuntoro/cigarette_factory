@@ -1,10 +1,8 @@
 <?php
 session_start();
 require_once __DIR__.'/../../config/db.php';
-require_once __DIR__.'/../templates/header.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin atau supervisor
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_production_results', 'read_production_results', 'update_production_results', 'delete_production_results'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -81,12 +79,13 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_results = $stmt->fetchColumn();
 $total_pages = ceil($total_results / $limit);
+require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Hasil Produksi</h1>
     <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/add.php" class="btn btn-success mb-3">Tambah Hasil Produksi</a>
-
+    
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">

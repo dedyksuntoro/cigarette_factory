@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__.'/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'create_users'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -12,11 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $email = $_POST['email'];
-    $role = $_POST['role'];
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (username, password, email, role, created_at) VALUES (?, ?, ?, ?, NOW())");
-        $stmt->execute([$username, $password, $email, $role]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$username, $password, $email]);
 
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
@@ -49,16 +47,6 @@ require_once __DIR__.'/../templates/header.php';
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="mb-3">
-            <label for="role" class="form-label">Role</label>
-            <select class="form-select" id="role" name="role" required>
-                <option value="admin">Admin</option>
-                <option value="supervisor">Supervisor</option>
-                <option value="operator">Operator</option>
-                <option value="gudang">Gudang</option>
-                <option value="keuangan">Keuangan</option>
-            </select>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/list.php" class="btn btn-secondary">Batal</a>

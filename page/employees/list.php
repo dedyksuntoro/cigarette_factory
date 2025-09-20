@@ -1,10 +1,8 @@
 <?php
 session_start();
 require_once __DIR__.'/../../config/db.php';
-require_once __DIR__.'/../templates/header.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_employees', 'read_employees', 'update_employees', 'delete_employees'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -89,12 +87,13 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_employees = $stmt->fetchColumn();
 $total_pages = ceil($total_employees / $limit);
+require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Karyawan</h1>
     <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/add.php" class="btn btn-success mb-3">Tambah Karyawan</a>
-
+    
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">

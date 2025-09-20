@@ -1,10 +1,8 @@
 <?php
 session_start();
 require_once __DIR__.'/../../config/db.php';
-require_once __DIR__.'/../templates/header.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin atau gudang
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'gudang'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_materials', 'read_materials', 'update_materials', 'delete_materials'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
@@ -79,12 +77,13 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_materials = $stmt->fetchColumn();
 $total_pages = ceil($total_materials / $limit);
+require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Bahan Baku</h1>
     <a href="<?php echo $_ENV['BASE_URL']; ?>/page/materials/add.php" class="btn btn-success mb-3">Tambah Bahan Baku</a>
-
+    
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">

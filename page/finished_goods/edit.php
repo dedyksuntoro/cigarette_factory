@@ -2,8 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-// Cek apakah pengguna sudah login dan memiliki peran admin atau gudang
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'gudang'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update_finished_goods'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
@@ -15,13 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
+
+        // Query untuk mengambil semua permissions pengguna
+        $stmt = $pdo->prepare("
+            SELECT p.name AS permission
+            FROM permissions p
+            INNER JOIN role_permissions rp ON p.id = rp.permission_id
+            INNER JOIN user_roles ur ON rp.role_id = ur.role_id
+            WHERE ur.user_id = ?
+        ");
+        $stmt->execute([$user['id']]);
+        $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); // Ambil kolom 'permission' sebagai array
+
+        // Simpan permissions ke session sebagai array
+        $_SESSION['role'] = $permissions ?: []; // Jika tidak ada permissions, simpan array kosong
 
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
         $stmt->execute([$user['id'], "Login berhasil untuk pengguna $username"]);
 
-        header('Location: '.$_ENV['BASE_URL'].'/index.php');
+        header('Location: ' . $_ENV['BASE_URL'] . '/index.php');
         exit();
     } else {
         $error = "Username atau password salah!";
