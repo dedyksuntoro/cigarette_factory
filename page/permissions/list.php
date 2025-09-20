@@ -58,7 +58,7 @@ $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $count_query = "SELECT COUNT(*) as total FROM permissions WHERE 1=1";
 $count_params = [];
 if ($filter_izin) {
-    $count_query .= " AND izin LIKE ?";
+    $count_query .= " AND name LIKE ?";
     $count_params[] = '%' . $filter_izin . '%';
 }
 if ($filter_created_date) {
