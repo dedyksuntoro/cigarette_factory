@@ -51,7 +51,7 @@ $stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
 
 // Eksekusi query
 $stmt->execute();
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Hitung total pengguna untuk paginasi
 $count_query = "SELECT COUNT(*) as total FROM permissions WHERE 1=1";
@@ -102,18 +102,18 @@ require_once __DIR__.'/../templates/header.php';
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($users)): ?>
+            <?php if (empty($permissions)): ?>
                 <tr><td colspan="6" class="text-center">Tidak ada data izin pengguna.</td></tr>
             <?php else: ?>
-                <?php foreach ($users as $user): ?>
+                <?php foreach ($permissions as $permission): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($user['id']); ?></td>
-                        <td><?php echo htmlspecialchars($user['name']); ?></td>
-                        <td><?php echo htmlspecialchars($user['description']); ?></td>
-                        <td><?php echo htmlspecialchars($user['created_at']); ?></td>
+                        <td><?php echo htmlspecialchars($permission['id']); ?></td>
+                        <td><?php echo htmlspecialchars($permission['name']); ?></td>
+                        <td><?php echo htmlspecialchars($permission['description']); ?></td>
+                        <td><?php echo htmlspecialchars($permission['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/edit.php?id=<?php echo $user['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/delete.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus izin pengguna ini?')">Hapus</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/edit.php?id=<?php echo $permission['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/delete.php?id=<?php echo $permission['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus izin pengguna ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
