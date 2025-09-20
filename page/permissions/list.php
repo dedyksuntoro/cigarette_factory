@@ -15,7 +15,7 @@ $stmt->execute([$_SESSION['user_id'], "Mengakses daftar izin pengguna"]);
 $filter_izin = $_GET['izin'] ?? '';
 $filter_created_date = $_GET['created_date'] ?? '';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 10; // Jumlah pengguna per halaman
+$limit = 10; // Jumlah izin pengguna per halaman
 $offset = ($page - 1) * $limit;
 
 // Bangun query dengan filter
@@ -25,7 +25,7 @@ $query = "SELECT id, name, description, created_at
 $params = [];
 
 if ($filter_izin) {
-    $query .= " AND name LIKE ?";
+    $query .= " AND `name` LIKE ?";
     $params[] = '%' . $filter_izin . '%';
 }
 if ($filter_created_date) {
@@ -53,7 +53,7 @@ $stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
 $stmt->execute();
 $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hitung total pengguna untuk paginasi
+// Hitung total izin pengguna untuk paginasi
 $count_query = "SELECT COUNT(*) as total FROM permissions WHERE 1=1";
 $count_params = [];
 if ($filter_izin) {
@@ -91,7 +91,7 @@ require_once __DIR__.'/../templates/header.php';
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
-    <!-- Tabel Pengguna -->
+    <!-- Tabel Izin Pengguna -->
     <table class="table table-bordered">
         <thead>
             <tr>
