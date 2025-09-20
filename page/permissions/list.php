@@ -68,7 +68,7 @@ if ($filter_created_date) {
 $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_permissions = $stmt->fetchColumn();
-$total_pages = ceil($total_permission / $limit);
+$total_pages = ceil($total_permissions / $limit);
 require_once __DIR__.'/../templates/header.php';
 ?>
 
