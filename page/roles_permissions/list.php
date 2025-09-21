@@ -2,41 +2,138 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles_permissions', 'read_roles_permissions', 'update_roles_permissions', 'delete_roles_permissions'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
-// Ambil daftar permissions
-$stmt = $pdo->query("SELECT * FROM permissions");
-$permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Catat log aktivitas akses halaman
+$stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
+$stmt->execute([$_SESSION['user_id'], "Mengakses daftar roles"]);
 
-// Ambil permissions untuk role tertentu (misal role_id = 1)
-$role_id = 1; // Ganti dengan role_id yang ingin diedit
-$stmt = $pdo->prepare("SELECT permission_id FROM role_permissions WHERE role_id = ?");
-$stmt->execute([$role_id]);
-$role_permissions = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+// Proses filter dan paginasi
+$filter_role = $_GET['role'] ?? '';
+$filter_created_date = $_GET['created_date'] ?? '';
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10; // Jumlah roles per halaman
+$offset = ($page - 1) * $limit;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $selected_permissions = $_POST['permissions'] ?? [];
-    // Hapus semua permissions untuk role ini
-    $stmt = $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ?");
-    $stmt->execute([$role_id]);
-    // Tambahkan permissions yang dipilih
-    foreach ($selected_permissions as $perm_id) {
-        $stmt = $pdo->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
-        $stmt->execute([$role_id, $perm_id]);
-    }
-    echo "<div class='alert alert-success'>Permissions diperbarui!</div>";
+// Bangun query dengan filter
+$query = "SELECT id, name, description, created_at 
+          FROM roles 
+          WHERE 1=1";
+$params = [];
+
+if ($filter_role) {
+    $query .= " AND name LIKE ?";
+    $params[] = '%' . $filter_role . '%';
 }
+if ($filter_created_date) {
+    $query .= " AND DATE(created_at) = ?";
+    $params[] = $filter_created_date;
+}
+
+$query .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+
+// Persiapkan statement
+$stmt = $pdo->prepare($query);
+
+// Ikat parameter filter
+$param_count = 1;
+foreach ($params as $param) {
+    $stmt->bindValue($param_count, $param, PDO::PARAM_STR);
+    $param_count++;
+}
+
+// Ikat parameter LIMIT dan OFFSET sebagai integer
+$stmt->bindValue($param_count, (int)$limit, PDO::PARAM_INT);
+$stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
+
+// Eksekusi query
+$stmt->execute();
+$roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Hitung total roles untuk paginasi
+$count_query = "SELECT COUNT(*) as total FROM roles WHERE 1=1";
+$count_params = [];
+if ($filter_role) {
+    $count_query .= " AND name LIKE ?";
+    $count_params[] = '%' . $filter_role . '%';
+}
+if ($filter_created_date) {
+    $count_query .= " AND DATE(created_at) = ?";
+    $count_params[] = $filter_created_date;
+}
+$stmt = $pdo->prepare($count_query);
+$stmt->execute($count_params);
+$total_roles = $stmt->fetchColumn();
+$total_pages = ceil($total_roles / $limit);
+
+require_once __DIR__ . '/../templates/header.php';
 ?>
-<form method="POST">
-    <?php foreach ($permissions as $perm): ?>
-        <div>
-            <input type="checkbox" name="permissions[]" value="<?php echo $perm['id']; ?>" 
-                   <?php echo in_array($perm['id'], $role_permissions) ? 'checked' : ''; ?>>
-            <?php echo htmlspecialchars($perm['name']); ?>
+
+<div class="container mt-4">
+    <h1>Manajemen Roles</h1>
+    
+    <!-- Form Filter -->
+    <form method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="role" class="form-label">Nama Role</label>
+                <input type="text" class="form-control" id="role" name="role" value="<?php echo htmlspecialchars($filter_role); ?>">
+            </div>
+            <div class="col-md-3">
+                <label for="created_date" class="form-label">Tanggal Dibuat</label>
+                <input type="date" class="form-control" id="created_date" name="created_date" value="<?php echo htmlspecialchars($filter_created_date); ?>">
+            </div>
         </div>
-    <?php endforeach; ?>
-    <button type="submit" class="btn btn-primary">Simpan</button>
-</form>
+        <button type="submit" class="btn btn-primary mt-3">Filter</button>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/list.php" class="btn btn-secondary mt-3">Reset</a>
+    </form>
+
+    <!-- Tabel Roles -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama Role</th>
+                <th>Deskripsi</th>
+                <th>Tanggal Dibuat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($roles)): ?>
+                <tr><td colspan="5" class="text-center">Tidak ada data roles.</td></tr>
+            <?php else: ?>
+                <?php foreach ($roles as $role): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($role['id']); ?></td>
+                        <td><?php echo htmlspecialchars($role['name']); ?></td>
+                        <td><?php echo htmlspecialchars($role['description']); ?></td>
+                        <td><?php echo htmlspecialchars($role['created_at']); ?></td>
+                        <td>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/edit.php?id=<?php echo $role['id']; ?>" class="btn btn-primary btn-sm">Edit Permissions</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <!-- Paginasi -->
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                    <a class="page-link" href="?page=<?php echo $i; ?>&role=<?php echo urlencode($filter_role); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+</div>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
