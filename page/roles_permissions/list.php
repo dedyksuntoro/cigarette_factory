@@ -115,6 +115,7 @@ require_once __DIR__ . '/../templates/header.php';
                         <td><?php echo htmlspecialchars($role['created_at']); ?></td>
                         <td>
                             <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/edit.php?id=<?php echo $role['id']; ?>" class="btn btn-primary btn-sm">Edit Permissions</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/delete.php?id=<?php echo $role['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -128,7 +129,6 @@ require_once __DIR__ . '/../templates/header.php';
             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
                     <a class="page-link" href="?page=<?php echo $i; ?>&role=<?php echo urlencode($filter_role); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
-                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/delete.php?id=<?php echo $role['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
                 </li>
             <?php endfor; ?>
         </ul>
