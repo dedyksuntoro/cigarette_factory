@@ -7,33 +7,37 @@ if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['delete_a
     exit();
 }
 
-// Ambil ID permission dari URL
+// Ambil ID role dari URL
 if (!isset($_GET['id'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/permissions/list.php');
     exit();
 }
-$permission_id = $_GET['id'];
+$role_id = $_GET['id'];
 
-// Ambil nama permission untuk log
-$stmt = $pdo->prepare("SELECT name FROM permissions WHERE id = ?");
-$stmt->execute([$permission_id]);
-$permission = $stmt->fetch(PDO::FETCH_ASSOC);
+// Ambil nama role untuk log
+$stmt = $pdo->prepare("SELECT name FROM roles WHERE id = ?");
+$stmt->execute([$role_id]);
+$role = $stmt->fetch(PDO::FETCH_ASSOC);
 
 try {
     // Mulai transaksi
     $pdo->beginTransaction();
 
     // Hapus entri terkait di role_permissions
-    $stmt = $pdo->prepare("DELETE FROM role_permissions WHERE permission_id = ?");
-    $stmt->execute([$permission_id]);
+    $stmt = $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ?");
+    $stmt->execute([$role_id]);
 
-    // Hapus permission
-    $stmt = $pdo->prepare("DELETE FROM permissions WHERE id = ?");
-    $stmt->execute([$permission_id]);
+    // Hapus entri terkait di user_roles
+    $stmt = $pdo->prepare("DELETE FROM user_roles WHERE role_id = ?");
+    $stmt->execute([$role_id]);
+
+    // Hapus role
+    $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
+    $stmt->execute([$role_id]);
 
     // Catat log aktivitas
     $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-    $stmt->execute([$_SESSION['user_id'], "Menghapus permission: " . ($permission['name'] ?? 'ID ' . $permission_id)]);
+    $stmt->execute([$_SESSION['user_id'], "Menghapus role: " . ($role['name'] ?? 'ID ' . $role_id)]);
 
     // Commit transaksi
     $pdo->commit();
@@ -42,6 +46,6 @@ try {
     exit();
 } catch (PDOException $e) {
     $pdo->rollBack();
-    echo "Gagal menghapus permission: " . $e->getMessage();
+    echo "Gagal menghapus role: " . $e->getMessage();
 }
 ?>
