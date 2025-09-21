@@ -9,13 +9,13 @@ if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_a
 
 // Catat log aktivitas akses halaman
 $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-$stmt->execute([$_SESSION['user_id'], "Mengakses daftar izin pengguna"]);
+$stmt->execute([$_SESSION['user_id'], "Mengakses daftar permissions"]);
 
 // Proses filter dan paginasi
 $filter_izin = $_GET['izin'] ?? '';
 $filter_created_date = $_GET['created_date'] ?? '';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 10; // Jumlah izin pengguna per halaman
+$limit = 10; // Jumlah permissions per halaman
 $offset = ($page - 1) * $limit;
 
 // Bangun query dengan filter
@@ -54,7 +54,7 @@ $stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
 $stmt->execute();
 $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hitung total izin pengguna untuk paginasi
+// Hitung total permissions untuk paginasi
 $count_query = "SELECT COUNT(*) as total FROM permissions WHERE 1=1";
 $count_params = [];
 if ($filter_izin) {
@@ -73,14 +73,14 @@ require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Izin Pengguna</h1>
-    <a href="add.php" class="btn btn-success mb-3">Tambah Izin Pengguna</a>
+    <h1>Manajemen Permissions</h1>
+    <a href="add.php" class="btn btn-success mb-3">Tambah Permission</a>
     
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-3">
-                <label for="izin" class="form-label">Izin Pengguna</label>
+                <label for="izin" class="form-label">Permission</label>
                 <input type="text" class="form-control" id="izin" name="izin" value="<?php echo htmlspecialchars($filter_izin); ?>">
             </div>
             <div class="col-md-3">
@@ -92,12 +92,12 @@ require_once __DIR__.'/../templates/header.php';
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
-    <!-- Tabel Izin Pengguna -->
+    <!-- Tabel Permissions -->
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Izin Pengguna</th>
+                <th>Permission</th>
                 <th>Deskripsi</th>
                 <th>Tanggal Dibuat</th>
                 <th>Aksi</th>
@@ -105,7 +105,7 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($permissions)): ?>
-                <tr><td colspan="6" class="text-center">Tidak ada data izin pengguna.</td></tr>
+                <tr><td colspan="6" class="text-center">Tidak ada data permissions.</td></tr>
             <?php else: ?>
                 <?php foreach ($permissions as $permission): ?>
                     <tr>
@@ -115,7 +115,7 @@ require_once __DIR__.'/../templates/header.php';
                         <td><?php echo htmlspecialchars($permission['created_at']); ?></td>
                         <td>
                             <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/edit.php?id=<?php echo $permission['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/delete.php?id=<?php echo $permission['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus izin pengguna ini?')">Hapus</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/delete.php?id=<?php echo $permission['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus permissions ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

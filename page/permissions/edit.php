@@ -7,14 +7,14 @@ if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update
     exit();
 }
 
-// Ambil ID izin pengguna dari URL
+// Ambil ID permissions dari URL
 if (!isset($_GET['id'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
 }
 $permission_id = $_GET['id'];
 
-// Ambil data izin pengguna
+// Ambil data permissions
 $stmt = $pdo->prepare("SELECT id, name, description FROM permissions WHERE id = ?");
 $stmt->execute([$permission_id]);
 $permission = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -34,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-        $stmt->execute([$_SESSION['user_id'], "Mengedit izin pengguna: $name"]);
+        $stmt->execute([$_SESSION['user_id'], "Mengedit permission: $name"]);
 
         header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
         exit();
     } catch (PDOException $e) {
-        $error = "Gagal mengedit izin pengguna: " . $e->getMessage();
+        $error = "Gagal mengedit permission: " . $e->getMessage();
     }
 }
 
@@ -53,7 +53,7 @@ require_once __DIR__.'/../templates/header.php';
     <?php } ?>
     <form method="POST">
         <div class="mb-3">
-            <label for="name" class="form-label">Izin Pengguna</label>
+            <label for="name" class="form-label">Permission</label>
             <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($permission['name']); ?>" required>
         </div>
         <div class="mb-3">

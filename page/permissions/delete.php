@@ -7,14 +7,14 @@ if (!isset($_SESSION['user_id']) || !hasPermission($role, ['delete_all', 'delete
     exit();
 }
 
-// Ambil ID izin pengguna dari URL
+// Ambil ID permissions dari URL
 if (!isset($_GET['id'])) {
     header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
 }
 $permission_id = $_GET['id'];
 
-// Ambil name izin pengguna untuk log
+// Ambil name permissions untuk log
 $stmt = $pdo->prepare("SELECT name FROM permissions WHERE id = ?");
 $stmt->execute([$permission_id]);
 $permission = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -25,11 +25,11 @@ try {
 
     // Catat log aktivitas
     $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-    $stmt->execute([$_SESSION['user_id'], "Menghapus izin pengguna: " . ($permission['name'] ?? 'ID ' . $permission_id)]);
+    $stmt->execute([$_SESSION['user_id'], "Menghapus permission: " . ($permission['name'] ?? 'ID ' . $permission_id)]);
 
     header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
 } catch (PDOException $e) {
-    echo "Gagal menghapus izin pengguna: " . $e->getMessage();
+    echo "Gagal menghapus permission: " . $e->getMessage();
 }
 ?>

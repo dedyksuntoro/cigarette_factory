@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-        $stmt->execute([$_SESSION['user_id'], "Menambahkan izin pengguna baru: $name"]);
+        $stmt->execute([$_SESSION['user_id'], "Menambahkan permission baru: $name"]);
 
         header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
         exit();
     } catch (PDOException $e) {
-        $error = "Gagal menambah izin pengguna: " . $e->getMessage();
+        $error = "Gagal menambah permission: " . $e->getMessage();
     }
 }
 
@@ -30,13 +30,13 @@ require_once __DIR__.'/../templates/header.php';
 ?>
 
 <div class="container mt-4">
-    <h1>Tambah Izin Pengguna</h1>
+    <h1>Tambah Permission</h1>
     <?php if (isset($error)) { ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php } ?>
     <form method="POST">
         <div class="mb-3">
-            <label for="name" class="form-label">Izin Pengguna</label>
+            <label for="name" class="form-label">Permission</label>
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
         <div class="mb-3">
