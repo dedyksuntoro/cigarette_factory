@@ -64,8 +64,8 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php">Manajemen Karyawan</a>
         </li>
     <?php } ?>
+    <hr/>
     <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_permissions', 'read_permissions', 'update_permissions', 'delete_permissions'])) { ?>
-        <hr/>
         <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php">Permissions</a>
         </li>
@@ -79,8 +79,8 @@
         <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php">Log Aktivitas</a>
         </li>
+        <hr/>
     <?php } ?>
-    <hr/>
     <li class="nav-item">
         <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/auth/logout.php">Logout</a>
     </li>
