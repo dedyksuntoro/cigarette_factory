@@ -64,19 +64,15 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php">Manajemen Karyawan</a>
         </li>
     <?php } ?>
-    <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_employees', 'read_employees', 'update_employees', 'delete_employees'])) { ?>
+    <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_permissions', 'read_permissions', 'update_permissions', 'delete_permissions'])) { ?>
+        <hr/>
         <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php">Manajemen Izin Pengguna</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php">Permissions</a>
         </li>
     <?php } ?>
     <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) { ?>
         <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/list.php">Manajemen Peran Pengguna</a>
-        </li>
-    <?php } ?>
-    <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles_permissions', 'read_roles_permissions', 'update_roles_permissions', 'delete_roles_permissions'])) { ?>
-        <li class="nav-item">
-            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/list.php">Manajemen Peran Izin</a>
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/list.php">Roles</a>
         </li>
     <?php } ?>
     <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_logs', 'read_logs', 'update_logs', 'delete_logs'])) { ?>
