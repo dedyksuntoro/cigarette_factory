@@ -74,6 +74,7 @@ require_once __DIR__ . '/../templates/header.php';
 
 <div class="container mt-4">
     <h1>Manajemen Roles</h1>
+    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/add.php" class="btn btn-success mb-3">Tambah Role</a>
     
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
@@ -127,6 +128,7 @@ require_once __DIR__ . '/../templates/header.php';
             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
                     <a class="page-link" href="?page=<?php echo $i; ?>&role=<?php echo urlencode($filter_role); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
+                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/delete.php?id=<?php echo $role['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
                 </li>
             <?php endfor; ?>
         </ul>
