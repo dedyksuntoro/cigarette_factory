@@ -80,6 +80,7 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php">Log Aktivitas</a>
         </li>
     <?php } ?>
+    <hr/>
     <li class="nav-item">
         <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/auth/logout.php">Logout</a>
     </li>
