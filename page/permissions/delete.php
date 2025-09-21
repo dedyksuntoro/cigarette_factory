@@ -1,51 +1,35 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__.'/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['delete_all', 'delete_permissions'])) {
-    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['delete_all', 'delete_permissions'])) {
+    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
     exit();
 }
 
-// Ambil ID role dari URL
+// Ambil ID izin pengguna dari URL
 if (!isset($_GET['id'])) {
-    header('Location: ' . $_ENV['BASE_URL'] . '/page/permissions/list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
 }
-$role_id = $_GET['id'];
+$permission_id = $_GET['id'];
 
-// Ambil nama role untuk log
-$stmt = $pdo->prepare("SELECT name FROM roles WHERE id = ?");
-$stmt->execute([$role_id]);
-$role = $stmt->fetch(PDO::FETCH_ASSOC);
+// Ambil name izin pengguna untuk log
+$stmt = $pdo->prepare("SELECT name FROM permissions WHERE id = ?");
+$stmt->execute([$permission_id]);
+$permission = $stmt->fetch(PDO::FETCH_ASSOC);
 
 try {
-    // Mulai transaksi
-    $pdo->beginTransaction();
-
-    // Hapus entri terkait di role_permissions
-    $stmt = $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ?");
-    $stmt->execute([$role_id]);
-
-    // Hapus entri terkait di user_roles
-    $stmt = $pdo->prepare("DELETE FROM user_roles WHERE role_id = ?");
-    $stmt->execute([$role_id]);
-
-    // Hapus role
-    $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
-    $stmt->execute([$role_id]);
+    $stmt = $pdo->prepare("DELETE FROM permissions WHERE id = ?");
+    $stmt->execute([$permission_id]);
 
     // Catat log aktivitas
     $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-    $stmt->execute([$_SESSION['user_id'], "Menghapus role: " . ($role['name'] ?? 'ID ' . $role_id)]);
+    $stmt->execute([$_SESSION['user_id'], "Menghapus izin pengguna: " . ($permission['name'] ?? 'ID ' . $permission_id)]);
 
-    // Commit transaksi
-    $pdo->commit();
-
-    header('Location: ' . $_ENV['BASE_URL'] . '/page/permissions/list.php');
+    header('Location: '.$_ENV['BASE_URL'].'/page/permissions/list.php');
     exit();
 } catch (PDOException $e) {
-    $pdo->rollBack();
-    echo "Gagal menghapus role: " . $e->getMessage();
+    echo "Gagal menghapus izin pengguna: " . $e->getMessage();
 }
 ?>

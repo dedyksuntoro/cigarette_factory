@@ -1,21 +1,21 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) {
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
 // Catat log aktivitas akses halaman
 $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-$stmt->execute([$_SESSION['user_id'], "Mengakses daftar peran pengguna"]);
+$stmt->execute([$_SESSION['user_id'], "Mengakses daftar roles"]);
 
 // Proses filter dan paginasi
 $filter_role = $_GET['role'] ?? '';
 $filter_created_date = $_GET['created_date'] ?? '';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 10; // Jumlah izin pengguna per halaman
+$limit = 10; // Jumlah roles per halaman
 $offset = ($page - 1) * $limit;
 
 // Bangun query dengan filter
@@ -32,7 +32,6 @@ if ($filter_created_date) {
     $query .= " AND DATE(created_at) = ?";
     $params[] = $filter_created_date;
 }
-
 
 $query .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
 
@@ -54,7 +53,7 @@ $stmt->bindValue($param_count + 1, (int)$offset, PDO::PARAM_INT);
 $stmt->execute();
 $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hitung total izin pengguna untuk paginasi
+// Hitung total roles untuk paginasi
 $count_query = "SELECT COUNT(*) as total FROM roles WHERE 1=1";
 $count_params = [];
 if ($filter_role) {
@@ -67,20 +66,21 @@ if ($filter_created_date) {
 }
 $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
-$total_role = $stmt->fetchColumn();
-$total_pages = ceil($total_role / $limit);
-require_once __DIR__.'/../templates/header.php';
+$total_roles = $stmt->fetchColumn();
+$total_pages = ceil($total_roles / $limit);
+
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Peran Pengguna</h1>
-    <a href="add.php" class="btn btn-success mb-3">Tambah Peran Pengguna</a>
+    <h1>Manajemen Roles</h1>
+    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/add.php" class="btn btn-success mb-3">Tambah Role</a>
     
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-3">
-                <label for="role" class="form-label">Peran Pengguna</label>
+                <label for="role" class="form-label">Nama Role</label>
                 <input type="text" class="form-control" id="role" name="role" value="<?php echo htmlspecialchars($filter_role); ?>">
             </div>
             <div class="col-md-3">
@@ -92,12 +92,12 @@ require_once __DIR__.'/../templates/header.php';
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
-    <!-- Tabel Izin Pengguna -->
+    <!-- Tabel Roles -->
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Peran Pengguna</th>
+                <th>Nama Role</th>
                 <th>Deskripsi</th>
                 <th>Tanggal Dibuat</th>
                 <th>Aksi</th>
@@ -105,17 +105,17 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($roles)): ?>
-                <tr><td colspan="6" class="text-center">Tidak ada data peran pengguna.</td></tr>
+                <tr><td colspan="5" class="text-center">Tidak ada data roles.</td></tr>
             <?php else: ?>
-                <?php foreach ($roles as $peran): ?>
+                <?php foreach ($roles as $role): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($peran['id']); ?></td>
-                        <td><?php echo htmlspecialchars($peran['name']); ?></td>
-                        <td><?php echo htmlspecialchars($peran['description']); ?></td>
-                        <td><?php echo htmlspecialchars($peran['created_at']); ?></td>
+                        <td><?php echo htmlspecialchars($role['id']); ?></td>
+                        <td><?php echo htmlspecialchars($role['name']); ?></td>
+                        <td><?php echo htmlspecialchars($role['description']); ?></td>
+                        <td><?php echo htmlspecialchars($role['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/edit.php?id=<?php echo $peran['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/delete.php?id=<?php echo $peran['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus peran pengguna ini?')">Hapus</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/edit.php?id=<?php echo $role['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/delete.php?id=<?php echo $role['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -128,7 +128,7 @@ require_once __DIR__.'/../templates/header.php';
         <ul class="pagination">
             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&izin=<?php echo urlencode($filter_role); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
+                    <a class="page-link" href="?page=<?php echo $i; ?>&role=<?php echo urlencode($filter_role); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
                 </li>
             <?php endfor; ?>
         </ul>
