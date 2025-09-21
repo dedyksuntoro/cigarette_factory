@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_a
 }
 
 // Ambil semua permissions
-$stmt = $pdo->query("SELECT id, name, description FROM permissions ORDER BY name");
+$stmt = $pdo->query("SELECT id, name, description FROM permissions ORDER BY id");
 $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

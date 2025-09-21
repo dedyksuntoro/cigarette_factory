@@ -25,7 +25,7 @@ if (!$role) {
 }
 
 // Ambil semua permissions
-$stmt = $pdo->query("SELECT id, name, description FROM permissions ORDER BY name");
+$stmt = $pdo->query("SELECT id, name, description FROM permissions ORDER BY id");
 $permissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Ambil permissions yang sudah terkait dengan role
