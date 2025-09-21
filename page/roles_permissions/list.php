@@ -2,8 +2,8 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !in_array('create_users', $_SESSION['role'])) {
-    header('Location: ' . $_ENV['BASE_URL'] . '/login.php');
+if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles_permissions', 'read_roles_permissions', 'update_roles_permissions', 'delete_roles_permissions'])) {
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
