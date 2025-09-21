@@ -74,6 +74,11 @@
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/list.php">Manajemen Peran Pengguna</a>
         </li>
     <?php } ?>
+    <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles_permissions', 'read_roles_permissions', 'update_roles_permissions', 'delete_roles_permissions'])) { ?>
+        <li class="nav-item">
+            <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/roles_permissions/list.php">Manajemen Peran Izin</a>
+        </li>
+    <?php } ?>
     <?php if (hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_logs', 'read_logs', 'update_logs', 'delete_logs'])) { ?>
         <li class="nav-item">
             <a class="nav-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php">Log Aktivitas</a>
