@@ -9,12 +9,13 @@ if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'create
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $created_by = $_SESSION['user_id']; // Gunakan user_id dari sesi sebagai created_by
+    $name = $_POST['name'];
     $plan_date = $_POST['plan_date'];
     $target_quantity = $_POST['target_quantity'];
     
     try {
-        $stmt = $pdo->prepare("INSERT INTO production_plans (created_by, plan_date, target_quantity, created_at) VALUES (?, ?, ?, NOW())");
-        $stmt->execute([$created_by, $plan_date, $target_quantity]);
+        $stmt = $pdo->prepare("INSERT INTO production_plans (created_by, name, plan_date, target_quantity, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$created_by, $name, $plan_date, $target_quantity]);
         
         // Catat log aktivitas
         $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
@@ -36,6 +37,10 @@ require_once __DIR__.'/../templates/header.php';
         <div class="alert alert-danger"><?php echo $error; ?></div>
     <?php } ?>
     <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nama Rencana</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
         <div class="mb-3">
             <label for="plan_date" class="form-label">Tanggal Rencana</label>
             <input type="date" class="form-control" id="plan_date" name="plan_date" required>

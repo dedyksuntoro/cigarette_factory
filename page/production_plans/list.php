@@ -12,6 +12,7 @@ $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?
 $stmt->execute([$_SESSION['user_id'], "Mengakses daftar perencanaan produksi"]);
 
 // Proses filter dan paginasi
+$filter_name = $_GET['name'] ?? '';
 $filter_plan_date = $_GET['plan_date'] ?? '';
 $filter_username = $_GET['username'] ?? '';
 $filter_target_quantity = $_GET['target_quantity'] ?? '';
@@ -20,12 +21,16 @@ $limit = 10; // Jumlah rencana per halaman
 $offset = ($page - 1) * $limit;
 
 // Bangun query dengan filter
-$query = "SELECT pp.id, pp.created_by, u.username, pp.plan_date, pp.target_quantity, pp.created_at 
+$query = "SELECT pp.id, pp.created_by, u.username, pp.plan_date, pp.name, pp.target_quantity, pp.created_at 
           FROM production_plans pp 
           LEFT JOIN users u ON pp.created_by = u.id 
           WHERE 1=1";
 $params = [];
 
+if ($filter_name) {
+    $query .= " AND pp.name LIKE ?";
+    $params[] = '%' . $filter_name . '%';
+}
 if ($filter_plan_date) {
     $query .= " AND pp.plan_date = ?";
     $params[] = $filter_plan_date;
@@ -62,6 +67,12 @@ $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Hitung total rencana untuk paginasi
 $count_query = "SELECT COUNT(*) as total FROM production_plans pp LEFT JOIN users u ON pp.created_by = u.id WHERE 1=1";
 $count_params = [];
+
+
+if ($filter_name) {
+    $count_query .= " AND pp.name LIKE ?";
+    $count_params[] = '%' . $filter_name . '%';
+}
 if ($filter_plan_date) {
     $count_query .= " AND pp.plan_date = ?";
     $count_params[] = $filter_plan_date;
@@ -89,6 +100,10 @@ require_once __DIR__.'/../templates/header.php';
     <form method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-4">
+                <label for="name" class="form-label">Nama Rencana</label>
+                <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($filter_name); ?>">
+            </div>
+            <div class="col-md-4">
                 <label for="plan_date" class="form-label">Tanggal Rencana</label>
                 <input type="date" class="form-control" id="plan_date" name="plan_date" value="<?php echo htmlspecialchars($filter_plan_date); ?>">
             </div>
@@ -111,6 +126,7 @@ require_once __DIR__.'/../templates/header.php';
             <tr>
                 <th>ID</th>
                 <th>Pembuat</th>
+                <th>Nama Rencana</th>
                 <th>Tanggal Rencana</th>
                 <th>Jumlah Target</th>
                 <th>Tanggal Dibuat</th>
@@ -125,6 +141,7 @@ require_once __DIR__.'/../templates/header.php';
                     <tr>
                         <td><?php echo htmlspecialchars($plan['id']); ?></td>
                         <td><?php echo htmlspecialchars($plan['username'] ?? 'Tidak terkait'); ?></td>
+                        <td><?php echo htmlspecialchars($plan['name'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($plan['plan_date']); ?></td>
                         <td><?php echo htmlspecialchars($plan['target_quantity']); ?></td>
                         <td><?php echo htmlspecialchars($plan['created_at']); ?></td>
