@@ -140,45 +140,48 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Pergerakan Stok -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Tipe</th>
-                <th>Bahan Baku</th>
-                <th>Barang Jadi</th>
-                <th>Jumlah</th>
-                <th>Tanggal Pergerakan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($stock_movements)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="7" class="text-center">Tidak ada data pergerakan stok.</td>
+                    <th>No</th>
+                    <th>Tipe</th>
+                    <th>Bahan Baku</th>
+                    <th>Barang Jadi</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal Pergerakan</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($stock_movements as $index => $movement): ?>
+            </thead>
+            <tbody>
+                <?php if (empty($stock_movements)): ?>
                     <tr>
-                        <td><?php echo ($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($movement['type'] == 'in' ? 'Masuk' : 'Keluar'); ?></td>
-                        <td><?php echo htmlspecialchars($movement['material_name'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($movement['finished_good_name'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($movement['quantity']); ?></td>
-                        <td><?php echo htmlspecialchars($movement['movement_date']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_stock_movements'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/edit.php?id=<?php echo $movement['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_stock_movements'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/delete.php?id=<?php echo $movement['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pergerakan stok ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="7" class="text-center">Tidak ada data pergerakan stok.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($stock_movements as $index => $movement): ?>
+                        <tr>
+                            <td><?php echo ($offset + $index + 1); ?></td>
+                            <td><?php echo htmlspecialchars($movement['type'] == 'in' ? 'Masuk' : 'Keluar'); ?></td>
+                            <td><?php echo htmlspecialchars($movement['material_name'] ?? '-'); ?></td>
+                            <td><?php echo htmlspecialchars($movement['finished_good_name'] ?? '-'); ?></td>
+                            <td><?php echo htmlspecialchars($movement['quantity']); ?></td>
+                            <td><?php echo htmlspecialchars($movement['movement_date']); ?></td>
+                            <td>
+                                <?php if (hasPermission($role, ['update_all', 'update_stock_movements'])): ?>
+
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/edit.php?id=<?php echo $movement['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <?php endif; ?>
+                                <?php if (hasPermission($role, ['delete_all', 'delete_stock_movements'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/delete.php?id=<?php echo $movement['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pergerakan stok ini?')">Hapus</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

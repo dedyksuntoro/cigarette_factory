@@ -123,45 +123,48 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Rencana Produksi -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Pembuat</th>
-                <th>Nama Rencana</th>
-                <th>Tanggal Rencana</th>
-                <th>Jumlah Target</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($plans)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="7" class="text-center">Tidak ada data rencana produksi.</td>
+                    <th>No</th>
+                    <th>Pembuat</th>
+                    <th>Nama Rencana</th>
+                    <th>Tanggal Rencana</th>
+                    <th>Jumlah Target</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($plans as $index => $plan): ?>
+            </thead>
+            <tbody>
+                <?php if (empty($plans)): ?>
                     <tr>
-                        <td><?php echo ($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($plan['username'] ?? 'Tidak terkait'); ?></td>
-                        <td><?php echo htmlspecialchars($plan['name'] ?? 'Tidak terkait'); ?></td>
-                        <td><?php echo htmlspecialchars($plan['plan_date']); ?></td>
-                        <td><?php echo htmlspecialchars($plan['target_quantity']); ?></td>
-                        <td><?php echo htmlspecialchars($plan['created_at']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_production_plans'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/edit.php?id=<?php echo $plan['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_production_plans'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/delete.php?id=<?php echo $plan['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus rencana ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="7" class="text-center">Tidak ada data rencana produksi.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($plans as $index => $plan): ?>
+                        <tr>
+                            <td><?php echo ($offset + $index + 1); ?></td>
+                            <td><?php echo htmlspecialchars($plan['username'] ?? 'Tidak terkait'); ?></td>
+                            <td><?php echo htmlspecialchars($plan['name'] ?? 'Tidak terkait'); ?></td>
+                            <td><?php echo htmlspecialchars($plan['plan_date']); ?></td>
+                            <td><?php echo htmlspecialchars($plan['target_quantity']); ?></td>
+
+                            <td><?php echo htmlspecialchars($plan['created_at']); ?></td>
+                            <td>
+                                <?php if (hasPermission($role, ['update_all', 'update_production_plans'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/edit.php?id=<?php echo $plan['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <?php endif; ?>
+                                <?php if (hasPermission($role, ['delete_all', 'delete_production_plans'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/delete.php?id=<?php echo $plan['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus rencana ini?')">Hapus</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

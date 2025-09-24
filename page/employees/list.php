@@ -126,47 +126,50 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Karyawan -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Username</th>
-                <th>Nama</th>
-                <th>Posisi</th>
-                <th>Shift</th>
-                <th>Gaji</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($employees)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="8" class="text-center">Tidak ada data karyawan.</td>
+                    <th>No</th>
+                    <th>Username</th>
+                    <th>Nama</th>
+                    <th>Posisi</th>
+                    <th>Shift</th>
+                    <th>Gaji</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($employees as $index => $employee): ?>
+            </thead>
+            <tbody>
+                <?php if (empty($employees)): ?>
                     <tr>
-                        <td><?php echo ($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($employee['username'] ?? 'Tidak terkait'); ?></td>
-                        <td><?php echo htmlspecialchars($employee['name']); ?></td>
-                        <td><?php echo htmlspecialchars($employee['position']); ?></td>
-                        <td><?php echo htmlspecialchars($employee['shift']); ?></td>
-                        <td><?php echo number_format($employee['salary'], 2, ',', '.'); ?></td>
-                        <td><?php echo htmlspecialchars($employee['created_at']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_employees'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_employees'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="8" class="text-center">Tidak ada data karyawan.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($employees as $index => $employee): ?>
+                        <tr>
+                            <td><?php echo ($offset + $index + 1); ?></td>
+
+                            <td><?php echo htmlspecialchars($employee['username'] ?? 'Tidak terkait'); ?></td>
+                            <td><?php echo htmlspecialchars($employee['name']); ?></td>
+                            <td><?php echo htmlspecialchars($employee['position']); ?></td>
+                            <td><?php echo htmlspecialchars($employee['shift']); ?></td>
+                            <td><?php echo number_format($employee['salary'], 2, ',', '.'); ?></td>
+                            <td><?php echo htmlspecialchars($employee['created_at']); ?></td>
+                            <td>
+                                <?php if (hasPermission($role, ['update_all', 'update_employees'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <?php endif; ?>
+                                <?php if (hasPermission($role, ['delete_all', 'delete_employees'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

@@ -40,6 +40,25 @@ $username = $_SESSION['username'];
             padding: 10px 20px;
             margin-bottom: 20px;
         }
+            /* Responsive Table */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+            }
+            table {
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 1rem;
+                background-color: transparent;
+            }
+            @media (max-width: 767.98px) {
+                table {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+            }
         /* Ensure sidebar stays fixed in desktop view */
         @media (min-width: 768px) {
             .sidebar {
