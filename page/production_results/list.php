@@ -12,7 +12,7 @@ $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?
 $stmt->execute([$_SESSION['user_id'], "Mengakses daftar hasil produksi"]);
 
 // Proses filter dan paginasi
-$filter_plan_id = $_GET['plan_id'] ?? '';
+$filter_plan_name = $_GET['plan_name'] ?? '';
 $filter_actual_quantity = $_GET['actual_quantity'] ?? '';
 $filter_efficiency = $_GET['efficiency'] ?? '';
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -20,15 +20,15 @@ $limit = 10; // Jumlah hasil per halaman
 $offset = ($page - 1) * $limit;
 
 // Bangun query dengan filter
-$query = "SELECT pr.id, pr.plan_id, pp.plan_date, pr.actual_quantity, pr.efficiency, pr.created_at 
+$query = "SELECT pr.id, pp.name, pp.plan_date, pr.actual_quantity, pr.efficiency, pr.created_at 
           FROM production_results pr 
           LEFT JOIN production_plans pp ON pr.plan_id = pp.id 
           WHERE 1=1";
 $params = [];
 
-if ($filter_plan_id) {
-    $query .= " AND pr.plan_id = ?";
-    $params[] = $filter_plan_id;
+if ($filter_plan_name) {
+    $query .= " AND pp.name LIKE ?";
+    $params[] = '%' . $filter_plan_name . '%';
 }
 if ($filter_actual_quantity) {
     $query .= " AND pr.actual_quantity = ?";
@@ -63,9 +63,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $count_query = "SELECT COUNT(*) as total FROM production_results pr 
                 LEFT JOIN production_plans pp ON pr.plan_id = pp.id WHERE 1=1";
 $count_params = [];
-if ($filter_plan_id) {
-    $count_query .= " AND pr.plan_id = ?";
-    $count_params[] = $filter_plan_id;
+if ($filter_plan_name) {
+    $query .= " AND pp.name LIKE ?";
+    $params[] = '%' . $filter_plan_name . '%';
 }
 if ($filter_actual_quantity) {
     $count_query .= " AND pr.actual_quantity = ?";
@@ -90,8 +90,8 @@ require_once __DIR__.'/../templates/header.php';
     <form method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-4">
-                <label for="plan_id" class="form-label">ID Rencana</label>
-                <input type="number" class="form-control" id="plan_id" name="plan_id" value="<?php echo htmlspecialchars($filter_plan_id); ?>">
+                <label for="plan_name" class="form-label">Nama Rencana</label>
+                <input type="text" class="form-control" id="plan_name" name="plan_name" value="<?php echo htmlspecialchars($filter_plan_name); ?>">
             </div>
             <div class="col-md-4">
                 <label for="actual_quantity" class="form-label">Jumlah Aktual</label>
@@ -111,7 +111,7 @@ require_once __DIR__.'/../templates/header.php';
         <thead>
             <tr>
                 <th>ID</th>
-                <th>ID Rencana</th>
+                <th>Nama Rencana</th>
                 <th>Tanggal Rencana</th>
                 <th>Jumlah Aktual</th>
                 <th>Efisiensi (%)</th>
@@ -126,7 +126,7 @@ require_once __DIR__.'/../templates/header.php';
                 <?php foreach ($results as $result): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($result['id']); ?></td>
-                        <td><?php echo htmlspecialchars($result['plan_id'] ?? 'Tidak terkait'); ?></td>
+                        <td><?php echo htmlspecialchars($result['name'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($result['plan_date'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($result['actual_quantity']); ?></td>
                         <td><?php echo $result['efficiency'] !== null ? htmlspecialchars(number_format($result['efficiency'], 2)) : 'N/A'; ?></td>
@@ -146,7 +146,7 @@ require_once __DIR__.'/../templates/header.php';
         <ul class="pagination">
             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&plan_id=<?php echo urlencode($filter_plan_id); ?>&actual_quantity=<?php echo urlencode($filter_actual_quantity); ?>&efficiency=<?php echo urlencode($filter_efficiency); ?>"><?php echo $i; ?></a>
+                    <a class="page-link" href="?page=<?php echo $i; ?>&plan_name=<?php echo urlencode($filter_plan_name); ?>&actual_quantity=<?php echo urlencode($filter_actual_quantity); ?>&efficiency=<?php echo urlencode($filter_efficiency); ?>"><?php echo $i; ?></a>
                 </li>
             <?php endfor; ?>
         </ul>

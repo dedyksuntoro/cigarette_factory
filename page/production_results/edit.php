@@ -1,15 +1,15 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update_production_results'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
 // Ambil ID hasil dari URL
 if (!isset($_GET['id'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/production_results/list.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/production_results/list.php');
     exit();
 }
 $result_id = $_GET['id'];
@@ -20,12 +20,12 @@ $stmt->execute([$result_id]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$result) {
-    header('Location: '.$_['BASE_URL'].'/page/production_results/list.php');
+    header('Location: ' . $_['BASE_URL'] . '/page/production_results/list.php');
     exit();
 }
 
 // Ambil daftar rencana produksi untuk dropdown
-$stmt = $pdo->query("SELECT id, plan_date, target_quantity FROM production_plans ORDER BY plan_date DESC");
+$stmt = $pdo->query("SELECT id, name, plan_date, target_quantity FROM production_plans ORDER BY plan_date DESC");
 $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -46,18 +46,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare("UPDATE production_results SET plan_id = ?, actual_quantity = ?, efficiency = ? WHERE id = ?");
         $stmt->execute([$plan_id, $actual_quantity, $efficiency, $result_id]);
 
-        // Catat log aktivitas
-        $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
-        $stmt->execute([$_SESSION['user_id'], "Mengedit hasil produksi untuk rencana ID " . ($plan_id ?? 'kosong')]);
+        // Ambil nama rencana produksi jika plan_id tidak kosong
+        $plan_name = 'kosong';
+        if ($plan_id) {
+            $stmt = $pdo->prepare("SELECT name FROM production_plans WHERE id = ?");
+            $stmt->execute([$plan_id]);
+            $plan = $stmt->fetch(PDO::FETCH_ASSOC);
+            $plan_name = $plan['name'] ?? 'kosong';
+        }
 
-        header('Location: '.$_ENV['BASE_URL'].'/page/production_results/list.php');
+        // Catat log aktivitas dengan nama rencana
+        $stmt = $pdo->prepare("INSERT INTO logs (user_id, action, log_time) VALUES (?, ?, NOW())");
+        $stmt->execute([$_SESSION['user_id'], "Mengedit hasil produksi untuk rencana " . $plan_name]);
+
+        header('Location: ' . $_ENV['BASE_URL'] . '/page/production_results/list.php');
         exit();
     } catch (PDOException $e) {
         $error = "Gagal mengedit hasil produksi: " . $e->getMessage();
     }
 }
 
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
@@ -72,7 +81,7 @@ require_once __DIR__.'/../templates/header.php';
                 <option value="">Tidak terkait rencana</option>
                 <?php foreach ($plans as $plan): ?>
                     <option value="<?php echo $plan['id']; ?>" <?php echo $plan['id'] == $result['plan_id'] ? 'selected' : ''; ?>>
-                        ID <?php echo $plan['id']; ?> - Tanggal <?php echo htmlspecialchars($plan['plan_date']); ?> (Target: <?php echo $plan['target_quantity']; ?>)
+                        <?php echo $plan['name']; ?> - Tanggal <?php echo htmlspecialchars($plan['plan_date']); ?> (Target: <?php echo $plan['target_quantity']; ?>)
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -89,4 +98,5 @@ require_once __DIR__.'/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
