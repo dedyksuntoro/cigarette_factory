@@ -13,6 +13,7 @@ $username = $_SESSION['username'];
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,44 +26,55 @@ $username = $_SESSION['username'];
             color: white;
             height: 100vh;
             padding: 15px;
-            overflow-y: auto; /* Add vertical scrollbar when content overflows */
+            overflow-y: auto;
+            /* Add vertical scrollbar when content overflows */
         }
+
         .sidebar .nav-link {
             color: white;
         }
+
         .sidebar .nav-link:hover {
             background-color: #495057;
             border-radius: 5px;
         }
+
         .header {
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
             margin-bottom: 20px;
         }
+
         /* Responsive Table */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
         }
+
         table {
             width: 100%;
             max-width: 100%;
             margin-bottom: 1rem;
             background-color: transparent;
         }
+
         /* Ensure sidebar stays fixed in desktop view */
         @media (min-width: 768px) {
             .sidebar {
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 250px; /* Adjust width as needed */
+                width: 250px;
+                /* Adjust width as needed */
             }
+
             .main-content {
-                margin-left: 250px; /* Match sidebar width to prevent overlap */
+                margin-left: 250px;
+                /* Match sidebar width to prevent overlap */
             }
         }
+
         /* Responsive Table for smaller screens */
         @media (max-width: 767.98px) {
             table {
@@ -72,54 +84,69 @@ $username = $_SESSION['username'];
                 -webkit-overflow-scrolling: touch;
             }
         }
+
         /* Custom styles for responsive pagination */
         @media (max-width: 576px) {
             .pagination {
                 font-size: 0.9rem;
             }
+
             .pagination .page-link {
                 padding: 0.25rem 0.5rem;
             }
+
             .btn-group .btn {
                 font-size: 0.85rem;
                 padding: 0.25rem 0.5rem;
             }
         }
+
+        .sidebar .nav-link.active,
+        .offcanvas .nav-link.active {
+            background-color: #007bff;
+            /* Warna latar belakang untuk menu aktif */
+            font-weight: bold;
+            /* Opsional: teks tebal */
+            border-radius: 5px;
+            color: white !important;
+            /* Pastikan warna teks kontras */
+        }
     </style>
 </head>
+
 <body>
 
-<!-- Navbar (mobile & desktop toggle) -->
-<nav class="navbar navbar-dark bg-dark d-md-none">
-    <div class="container-fluid">
-        <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-            ☰ Menu
-        </button>
-        <span class="navbar-text text-white">Cigarette Factory</span>
-    </div>
-</nav>
+    <!-- Navbar (mobile & desktop toggle) -->
+    <nav class="navbar navbar-dark bg-dark d-md-none">
+        <div class="container-fluid">
+            <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                ☰ Menu
+            </button>
+            <span class="navbar-text text-white">Cigarette Factory</span>
+        </div>
+    </nav>
 
-<!-- Sidebar Offcanvas for Mobile -->
-<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarOffcanvas">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Menu</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-        <?php include 'sidebar.php'; ?>
-    </div>
-</div>
-
-<!-- Main Layout -->
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar for Desktop -->
-        <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar">
+    <!-- Sidebar Offcanvas for Mobile -->
+    <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body sidebar">
             <?php include 'sidebar.php'; ?>
-        </nav>
+        </div>
+    </div>
 
-        <!-- Content Area -->
-        <main class="col-md-9 col-lg-10 px-4 py-3 main-content">
-            <div class="header">
-                <span>Selamat datang, <?php echo htmlspecialchars($username); ?></span>
-            </div>
+    <!-- Main Layout -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar for Desktop -->
+            <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar">
+                <?php include 'sidebar.php'; ?>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="col-md-9 col-lg-10 px-4 py-3 main-content">
+                <div class="header">
+                    <span>Selamat datang, <?php echo htmlspecialchars($username); ?></span>
+                </div>
