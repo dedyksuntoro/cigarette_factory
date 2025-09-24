@@ -71,33 +71,45 @@ $total_pages = ceil($total_expenses / $limit);
 
 // Sertakan header setelah logika selesai
 require_once __DIR__ . '/../templates/header.php';
+
+// URL parameter untuk mempertahankan filter
+$base_url = "?description=" . urlencode($filter_description) . "&expense_date=" . urlencode($filter_expense_date) . "&page=";
+
+// Hitung rentang halaman untuk ditampilkan
+$max_visible_pages = 5;
+$half_visible = floor($max_visible_pages / 2);
+$start_page = max(1, $page - $half_visible);
+$end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+$start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Pengeluaran</h1>
-    <?php if (hasPermission($role, ['create_all', 'create_expanses'])): ?>
+    <?php if (hasPermission($role, ['create_all', 'create_expenses'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/add.php" class="btn btn-success mb-3">Tambah Pengeluaran</a>
     <?php endif; ?>
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
+        <div class="row g-3">
+            <div class="col-md-4 col-sm-6">
                 <label for="description" class="form-label">Deskripsi</label>
                 <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($filter_description); ?>">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-6">
                 <label for="expense_date" class="form-label">Tanggal Pengeluaran</label>
                 <input type="date" class="form-control" id="expense_date" name="expense_date" value="<?php echo htmlspecialchars($filter_expense_date); ?>">
             </div>
+            <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/list.php" class="btn btn-secondary">Reset</a>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Pengeluaran -->
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>No</th>
@@ -109,7 +121,6 @@ require_once __DIR__ . '/../templates/header.php';
                 </tr>
             </thead>
             <tbody>
-
                 <?php if (empty($expenses)): ?>
                     <tr>
                         <td colspan="6" class="text-center">Tidak ada data pengeluaran.</td>
@@ -123,12 +134,14 @@ require_once __DIR__ . '/../templates/header.php';
                             <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
                             <td><?php echo htmlspecialchars($expense['created_at']); ?></td>
                             <td>
-                                <?php if (hasPermission($role, ['update_all', 'update_expanses'])): ?>
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                                <?php endif; ?>
-                                <?php if (hasPermission($role, ['delete_all', 'delete_expanses'])): ?>
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
-                                <?php endif; ?>
+                                <div class="btn-group" role="group">
+                                    <?php if (hasPermission($role, ['update_all', 'update_expenses'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission($role, ['delete_all', 'delete_expenses'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -138,15 +151,59 @@ require_once __DIR__ . '/../templates/header.php';
     </div>
 
     <!-- Paginasi -->
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&description=<?php echo urlencode($filter_description); ?>&expense_date=<?php echo urlencode($filter_expense_date); ?>"><?php echo $i; ?></a>
+    <?php if ($total_pages > 1): ?>
+        <nav aria-label="Pagination" class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Menampilkan <?php echo count($expenses); ?> dari <?php echo $total_expenses; ?> data
+            </div>
+            <ul class="pagination mb-0 flex-wrap">
+                <!-- Previous Button -->
+                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page > 1 ? $base_url . ($page - 1) : '#'; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+
+                <!-- First Page -->
+                <?php if ($start_page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . '1'; ?>">1</a>
+                    </li>
+                    <?php if ($start_page > 2): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Page Numbers -->
+                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url . $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <!-- Last Page -->
+                <?php if ($end_page < $total_pages): ?>
+                    <?php if ($end_page < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page < $total_pages ? $base_url . ($page + 1) : '#'; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS CDN -->

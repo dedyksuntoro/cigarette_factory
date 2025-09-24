@@ -1,10 +1,10 @@
 <?php
 // session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 // Cek apakah pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
@@ -40,25 +40,17 @@ $username = $_SESSION['username'];
             padding: 10px 20px;
             margin-bottom: 20px;
         }
-            /* Responsive Table */
-            .table-responsive {
-                width: 100%;
-                overflow-x: auto;
-            }
-            table {
-                width: 100%;
-                max-width: 100%;
-                margin-bottom: 1rem;
-                background-color: transparent;
-            }
-            @media (max-width: 767.98px) {
-                table {
-                    display: block;
-                    width: 100%;
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-            }
+        /* Responsive Table */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+            background-color: transparent;
+        }
         /* Ensure sidebar stays fixed in desktop view */
         @media (min-width: 768px) {
             .sidebar {
@@ -69,6 +61,28 @@ $username = $_SESSION['username'];
             }
             .main-content {
                 margin-left: 250px; /* Match sidebar width to prevent overlap */
+            }
+        }
+        /* Responsive Table for smaller screens */
+        @media (max-width: 767.98px) {
+            table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        /* Custom styles for responsive pagination */
+        @media (max-width: 576px) {
+            .pagination {
+                font-size: 0.9rem;
+            }
+            .pagination .page-link {
+                padding: 0.25rem 0.5rem;
+            }
+            .btn-group .btn {
+                font-size: 0.85rem;
+                padding: 0.25rem 0.5rem;
             }
         }
     </style>

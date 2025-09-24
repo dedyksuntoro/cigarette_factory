@@ -65,29 +65,41 @@ $stmt->execute();
 $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Hitung total karyawan untuk paginasi
-$count_query = "SELECT COUNT(*) as total FROM employees WHERE 1=1";
+$count_query = "SELECT COUNT(*) as total FROM employees e LEFT JOIN users u ON e.user_id = u.id WHERE 1=1";
 $count_params = [];
 if ($filter_name) {
-    $count_query .= " AND name LIKE ?";
+    $count_query .= " AND e.name LIKE ?";
     $count_params[] = '%' . $filter_name . '%';
 }
 if ($filter_position) {
-    $count_query .= " AND position LIKE ?";
+    $count_query .= " AND e.position LIKE ?";
     $count_params[] = '%' . $filter_position . '%';
 }
 if ($filter_shift) {
-    $count_query .= " AND shift = ?";
+    $count_query .= " AND e.shift = ?";
     $count_params[] = $filter_shift;
 }
 if ($filter_created_date) {
-    $count_query .= " AND DATE(created_at) = ?";
+    $count_query .= " AND DATE(e.created_at) = ?";
     $count_params[] = $filter_created_date;
 }
 $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_employees = $stmt->fetchColumn();
 $total_pages = ceil($total_employees / $limit);
+
+// Sertakan header setelah logika selesai
 require_once __DIR__ . '/../templates/header.php';
+
+// URL parameter untuk mempertahankan filter
+$base_url = "?name=" . urlencode($filter_name) . "&position=" . urlencode($filter_position) . "&shift=" . urlencode($filter_shift) . "&created_date=" . urlencode($filter_created_date) . "&page=";
+
+// Hitung rentang halaman untuk ditampilkan
+$max_visible_pages = 5;
+$half_visible = floor($max_visible_pages / 2);
+$start_page = max(1, $page - $half_visible);
+$end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+$start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
@@ -98,16 +110,16 @@ require_once __DIR__ . '/../templates/header.php';
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-3">
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="name" class="form-label">Nama</label>
                 <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($filter_name); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="position" class="form-label">Posisi</label>
                 <input type="text" class="form-control" id="position" name="position" value="<?php echo htmlspecialchars($filter_position); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="shift" class="form-label">Shift</label>
                 <select class="form-select" id="shift" name="shift">
                     <option value="">Semua Shift</option>
@@ -116,18 +128,20 @@ require_once __DIR__ . '/../templates/header.php';
                     <option value="malam" <?php echo $filter_shift == 'malam' ? 'selected' : ''; ?>>Malam</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="created_date" class="form-label">Tanggal Dibuat</label>
                 <input type="date" class="form-control" id="created_date" name="created_date" value="<?php echo htmlspecialchars($filter_created_date); ?>">
             </div>
+            <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php" class="btn btn-secondary">Reset</a>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Karyawan -->
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>No</th>
@@ -149,7 +163,6 @@ require_once __DIR__ . '/../templates/header.php';
                     <?php foreach ($employees as $index => $employee): ?>
                         <tr>
                             <td><?php echo ($offset + $index + 1); ?></td>
-
                             <td><?php echo htmlspecialchars($employee['username'] ?? 'Tidak terkait'); ?></td>
                             <td><?php echo htmlspecialchars($employee['name']); ?></td>
                             <td><?php echo htmlspecialchars($employee['position']); ?></td>
@@ -157,12 +170,14 @@ require_once __DIR__ . '/../templates/header.php';
                             <td><?php echo number_format($employee['salary'], 2, ',', '.'); ?></td>
                             <td><?php echo htmlspecialchars($employee['created_at']); ?></td>
                             <td>
-                                <?php if (hasPermission($role, ['update_all', 'update_employees'])): ?>
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                                <?php endif; ?>
-                                <?php if (hasPermission($role, ['delete_all', 'delete_employees'])): ?>
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
-                                <?php endif; ?>
+                                <div class="btn-group" role="group">
+                                    <?php if (hasPermission($role, ['update_all', 'update_employees'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission($role, ['delete_all', 'delete_employees'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -172,15 +187,59 @@ require_once __DIR__ . '/../templates/header.php';
     </div>
 
     <!-- Paginasi -->
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&name=<?php echo urlencode($filter_name); ?>&position=<?php echo urlencode($filter_position); ?>&shift=<?php echo urlencode($filter_shift); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
+    <?php if ($total_pages > 1): ?>
+        <nav aria-label="Pagination" class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Menampilkan <?php echo count($employees); ?> dari <?php echo $total_employees; ?> data
+            </div>
+            <ul class="pagination mb-0 flex-wrap">
+                <!-- Previous Button -->
+                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page > 1 ? $base_url . ($page - 1) : '#'; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+
+                <!-- First Page -->
+                <?php if ($start_page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . '1'; ?>">1</a>
+                    </li>
+                    <?php if ($start_page > 2): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Page Numbers -->
+                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url . $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <!-- Last Page -->
+                <?php if ($end_page < $total_pages): ?>
+                    <?php if ($end_page < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page < $total_pages ? $base_url . ($page + 1) : '#'; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS CDN -->

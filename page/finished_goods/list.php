@@ -86,7 +86,19 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_goods = $stmt->fetchColumn();
 $total_pages = ceil($total_goods / $limit);
+
+// Sertakan header setelah logika selesai
 require_once __DIR__ . '/../templates/header.php';
+
+// URL parameter untuk mempertahankan filter
+$base_url = "?product_name=" . urlencode($filter_product_name) . "&unit=" . urlencode($filter_unit) . "&stock=" . urlencode($filter_stock) . "&created_date=" . urlencode($filter_created_date) . "&page=";
+
+// Hitung rentang halaman untuk ditampilkan
+$max_visible_pages = 5;
+$half_visible = floor($max_visible_pages / 2);
+$start_page = max(1, $page - $half_visible);
+$end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+$start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
@@ -97,31 +109,33 @@ require_once __DIR__ . '/../templates/header.php';
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-3">
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="product_name" class="form-label">Nama Produk</label>
                 <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo htmlspecialchars($filter_product_name); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="unit" class="form-label">Unit</label>
                 <input type="text" class="form-control" id="unit" name="unit" value="<?php echo htmlspecialchars($filter_unit); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="stock" class="form-label">Stok</label>
                 <input type="number" step="0.01" class="form-control" id="stock" name="stock" value="<?php echo htmlspecialchars($filter_stock); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="created_date" class="form-label">Tanggal Dibuat</label>
                 <input type="date" class="form-control" id="created_date" name="created_date" value="<?php echo htmlspecialchars($filter_created_date); ?>">
             </div>
+            <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php" class="btn btn-secondary">Reset</a>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Barang Jadi -->
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>No</th>
@@ -146,13 +160,14 @@ require_once __DIR__ . '/../templates/header.php';
                             <td><?php echo number_format($good['stock'], 2, ',', '.'); ?></td>
                             <td><?php echo htmlspecialchars($good['created_at']); ?></td>
                             <td>
-                                <?php if (hasPermission($role, ['update_all', 'update_finished_goods'])): ?>
-
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/edit.php?id=<?php echo $good['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                                <?php endif; ?>
-                                <?php if (hasPermission($role, ['delete_all', 'delete_finished_goods'])): ?>
-                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/delete.php?id=<?php echo $good['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus barang jadi ini?')">Hapus</a>
-                                <?php endif; ?>
+                                <div class="btn-group" role="group">
+                                    <?php if (hasPermission($role, ['update_all', 'update_finished_goods'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/edit.php?id=<?php echo $good['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission($role, ['delete_all', 'delete_finished_goods'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/delete.php?id=<?php echo $good['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus barang jadi ini?')">Hapus</a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -162,15 +177,59 @@ require_once __DIR__ . '/../templates/header.php';
     </div>
 
     <!-- Paginasi -->
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/list.php?page=<?php echo $i; ?>&product_name=<?php echo urlencode($filter_product_name); ?>&unit=<?php echo urlencode($filter_unit); ?>&stock=<?php echo urlencode($filter_stock); ?>&created_date=<?php echo urlencode($filter_created_date); ?>"><?php echo $i; ?></a>
+    <?php if ($total_pages > 1): ?>
+        <nav aria-label="Pagination" class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Menampilkan <?php echo count($finished_goods); ?> dari <?php echo $total_goods; ?> data
+            </div>
+            <ul class="pagination mb-0 flex-wrap">
+                <!-- Previous Button -->
+                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page > 1 ? $base_url . ($page - 1) : '#'; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+
+                <!-- First Page -->
+                <?php if ($start_page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . '1'; ?>">1</a>
+                    </li>
+                    <?php if ($start_page > 2): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Page Numbers -->
+                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url . $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <!-- Last Page -->
+                <?php if ($end_page < $total_pages): ?>
+                    <?php if ($end_page < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page < $total_pages ? $base_url . ($page + 1) : '#'; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS CDN -->

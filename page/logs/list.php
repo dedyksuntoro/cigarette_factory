@@ -84,6 +84,16 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_logs = $stmt->fetchColumn();
 $total_pages = ceil($total_logs / $limit);
+
+// URL parameter untuk mempertahankan filter
+$base_url = "?start_date=" . urlencode($filter_start_date) . "&end_date=" . urlencode($filter_end_date) . "&username=" . urlencode($filter_username) . "&action=" . urlencode($filter_action) . "&page=";
+
+// Hitung rentang halaman untuk ditampilkan
+$max_visible_pages = 5;
+$half_visible = floor($max_visible_pages / 2);
+$start_page = max(1, $page - $half_visible);
+$end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+$start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
@@ -91,31 +101,33 @@ $total_pages = ceil($total_logs / $limit);
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-3">
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="start_date" class="form-label">Tanggal Awal</label>
                 <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($filter_start_date); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="end_date" class="form-label">Tanggal Akhir</label>
                 <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($filter_end_date); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($filter_username); ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-6">
                 <label for="action" class="form-label">Aksi (Kata Kunci)</label>
                 <input type="text" class="form-control" id="action" name="action" value="<?php echo htmlspecialchars($filter_action); ?>">
             </div>
+            <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php" class="btn btn-secondary">Reset</a>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Log -->
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>No</th>
@@ -131,7 +143,6 @@ $total_pages = ceil($total_logs / $limit);
                     </tr>
                 <?php else: ?>
                     <?php foreach ($logs as $index => $log): ?>
-
                         <tr>
                             <td><?php echo ($offset + $index + 1); ?></td>
                             <td><?php echo htmlspecialchars($log['username'] ?? 'Unknown'); ?></td>
@@ -145,15 +156,59 @@ $total_pages = ceil($total_logs / $limit);
     </div>
 
     <!-- Paginasi -->
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&start_date=<?php echo urlencode($filter_start_date); ?>&end_date=<?php echo urlencode($filter_end_date); ?>&username=<?php echo urlencode($filter_username); ?>&action=<?php echo urlencode($filter_action); ?>"><?php echo $i; ?></a>
+    <?php if ($total_pages > 1): ?>
+        <nav aria-label="Pagination" class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Menampilkan <?php echo count($logs); ?> dari <?php echo $total_logs; ?> data
+            </div>
+            <ul class="pagination mb-0 flex-wrap">
+                <!-- Previous Button -->
+                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page > 1 ? $base_url . ($page - 1) : '#'; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+
+                <!-- First Page -->
+                <?php if ($start_page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . '1'; ?>">1</a>
+                    </li>
+                    <?php if ($start_page > 2): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Page Numbers -->
+                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url . $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <!-- Last Page -->
+                <?php if ($end_page < $total_pages): ?>
+                    <?php if ($end_page < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page < $total_pages ? $base_url . ($page + 1) : '#'; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS CDN -->

@@ -64,8 +64,8 @@ $count_query = "SELECT COUNT(*) as total FROM production_results pr
                 LEFT JOIN production_plans pp ON pr.plan_id = pp.id WHERE 1=1";
 $count_params = [];
 if ($filter_plan_name) {
-    $query .= " AND pp.name LIKE ?";
-    $params[] = '%' . $filter_plan_name . '%';
+    $count_query .= " AND pp.name LIKE ?";
+    $count_params[] = '%' . $filter_plan_name . '%';
 }
 if ($filter_actual_quantity) {
     $count_query .= " AND pr.actual_quantity = ?";
@@ -79,7 +79,19 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_results = $stmt->fetchColumn();
 $total_pages = ceil($total_results / $limit);
+
+// Sertakan header setelah logika selesai
 require_once __DIR__ . '/../templates/header.php';
+
+// URL parameter untuk mempertahankan filter
+$base_url = "?plan_name=" . urlencode($filter_plan_name) . "&actual_quantity=" . urlencode($filter_actual_quantity) . "&efficiency=" . urlencode($filter_efficiency) . "&page=";
+
+// Hitung rentang halaman untuk ditampilkan
+$max_visible_pages = 5;
+$half_visible = floor($max_visible_pages / 2);
+$start_page = max(1, $page - $half_visible);
+$end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+$start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
@@ -90,79 +102,125 @@ require_once __DIR__ . '/../templates/header.php';
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
+        <div class="row g-3">
+            <div class="col-md-4 col-sm-6">
                 <label for="plan_name" class="form-label">Nama Rencana</label>
                 <input type="text" class="form-control" id="plan_name" name="plan_name" value="<?php echo htmlspecialchars($filter_plan_name); ?>">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-6">
                 <label for="actual_quantity" class="form-label">Jumlah Aktual</label>
                 <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" value="<?php echo htmlspecialchars($filter_actual_quantity); ?>">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-6">
                 <label for="efficiency" class="form-label">Efisiensi (%)</label>
                 <input type="number" step="0.01" class="form-control" id="efficiency" name="efficiency" value="<?php echo htmlspecialchars($filter_efficiency); ?>">
             </div>
+            <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary">Reset</a>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary mt-3">Reset</a>
     </form>
 
     <!-- Tabel Hasil Produksi -->
-    <table class="table table-bordered">
-        <div class="table-responsive">
-            <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Rencana</th>
-                <th>Tanggal Rencana</th>
-                <th>Jumlah Aktual</th>
-                <th>Efisiensi (%)</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($results)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
                 <tr>
-                    <td colspan="7" class="text-center">Tidak ada data hasil produksi.</td>
+                    <th>No</th>
+                    <th>Nama Rencana</th>
+                    <th>Tanggal Rencana</th>
+                    <th>Jumlah Aktual</th>
+                    <th>Efisiensi (%)</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($results as $index => $result): ?>
+            </thead>
+            <tbody>
+                <?php if (empty($results)): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($result['name'] ?? 'Tidak terkait'); ?></td>
-                        <td><?php echo htmlspecialchars($result['plan_date'] ?? 'Tidak terkait'); ?></td>
-                        <td><?php echo htmlspecialchars($result['actual_quantity']); ?></td>
-                        <td><?php echo $result['efficiency'] !== null ? htmlspecialchars(number_format($result['efficiency'], 2)) : 'N/A'; ?></td>
-                        <td><?php echo htmlspecialchars($result['created_at']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_production_results'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/edit.php?id=<?php echo $result['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_production_results'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/delete.php?id=<?php echo $result['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus hasil ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="7" class="text-center">Tidak ada data hasil produksi.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-            </table>
-        </div>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($results as $index => $result): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($offset + $index + 1); ?></td>
+                            <td><?php echo htmlspecialchars($result['name'] ?? 'Tidak terkait'); ?></td>
+                            <td><?php echo htmlspecialchars($result['plan_date'] ?? 'Tidak terkait'); ?></td>
+                            <td><?php echo htmlspecialchars($result['actual_quantity']); ?></td>
+                            <td><?php echo $result['efficiency'] !== null ? htmlspecialchars(number_format($result['efficiency'], 2)) : 'N/A'; ?></td>
+                            <td><?php echo htmlspecialchars($result['created_at']); ?></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <?php if (hasPermission($role, ['update_all', 'update_production_results'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/edit.php?id=<?php echo $result['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission($role, ['delete_all', 'delete_production_results'])): ?>
+                                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/delete.php?id=<?php echo $result['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus hasil ini?')">Hapus</a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>&plan_name=<?php echo urlencode($filter_plan_name); ?>&actual_quantity=<?php echo urlencode($filter_actual_quantity); ?>&efficiency=<?php echo urlencode($filter_efficiency); ?>"><?php echo $i; ?></a>
+    <?php if ($total_pages > 1): ?>
+        <nav aria-label="Pagination" class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Menampilkan <?php echo count($results); ?> dari <?php echo $total_results; ?> data
+            </div>
+            <ul class="pagination mb-0 flex-wrap">
+                <!-- Previous Button -->
+                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page > 1 ? $base_url . ($page - 1) : '#'; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+
+                <!-- First Page -->
+                <?php if ($start_page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . '1'; ?>">1</a>
+                    </li>
+                    <?php if ($start_page > 2): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!-- Page Numbers -->
+                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                        <a class="page-link" href="<?php echo $base_url . $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <!-- Last Page -->
+                <?php if ($end_page < $total_pages): ?>
+                    <?php if ($end_page < $total_pages - 1): ?>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <?php endif; ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $base_url . $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Next Button -->
+                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo $page < $total_pages ? $base_url . ($page + 1) : '#'; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS CDN -->
