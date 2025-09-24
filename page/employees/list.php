@@ -129,7 +129,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Username</th>
                 <th>Nama</th>
                 <th>Posisi</th>
@@ -145,9 +145,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="8" class="text-center">Tidak ada data karyawan.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($employees as $employee): ?>
+                <?php foreach ($employees as $index => $employee): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($employee['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($employee['username'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($employee['name']); ?></td>
                         <td><?php echo htmlspecialchars($employee['position']); ?></td>

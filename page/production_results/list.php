@@ -112,7 +112,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Nama Rencana</th>
                 <th>Tanggal Rencana</th>
                 <th>Jumlah Aktual</th>
@@ -127,9 +127,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="7" class="text-center">Tidak ada data hasil produksi.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($results as $result): ?>
+                <?php foreach ($results as $index => $result): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($result['id']); ?></td>
+                        <td><?php echo htmlspecialchars($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($result['name'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($result['plan_date'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($result['actual_quantity']); ?></td>

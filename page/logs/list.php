@@ -117,7 +117,7 @@ $total_pages = ceil($total_logs / $limit);
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Pengguna</th>
                 <th>Aksi</th>
                 <th>Waktu</th>
@@ -127,9 +127,9 @@ $total_pages = ceil($total_logs / $limit);
             <?php if (empty($logs)): ?>
                 <tr><td colspan="4" class="text-center">Tidak ada data log.</td></tr>
             <?php else: ?>
-                <?php foreach ($logs as $log): ?>
+                <?php foreach ($logs as $index => $log): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($log['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($log['username'] ?? 'Unknown'); ?></td>
                         <td><?php echo htmlspecialchars($log['action']); ?></td>
                         <td><?php echo htmlspecialchars($log['log_time']); ?></td>

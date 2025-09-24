@@ -125,7 +125,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Distribusi</th>
                 <th>Jumlah Tagihan</th>
                 <th>Status</th>
@@ -139,9 +139,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="6" class="text-center">Tidak ada data faktur.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($invoices as $invoice): ?>
+                <?php foreach ($invoices as $index => $invoice): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($invoice['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($invoice['destination']); ?></td>
                         <td><?php echo number_format($invoice['amount'], 2, ',', '.'); ?></td>
                         <td><?php echo htmlspecialchars($invoice['status'] == 'unpaid' ? 'Belum Dibayar' : 'Sudah Dibayar'); ?></td>

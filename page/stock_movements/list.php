@@ -143,7 +143,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Tipe</th>
                 <th>Bahan Baku</th>
                 <th>Barang Jadi</th>
@@ -158,9 +158,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="7" class="text-center">Tidak ada data pergerakan stok.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($stock_movements as $movement): ?>
+                <?php foreach ($stock_movements as $index => $movement): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($movement['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($movement['type'] == 'in' ? 'Masuk' : 'Keluar'); ?></td>
                         <td><?php echo htmlspecialchars($movement['material_name'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($movement['finished_good_name'] ?? '-'); ?></td>

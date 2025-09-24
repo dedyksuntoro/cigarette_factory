@@ -123,7 +123,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Nama Produk</th>
                 <th>Unit</th>
                 <th>Stok</th>
@@ -137,9 +137,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="6" class="text-center">Tidak ada data barang jadi.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($finished_goods as $good): ?>
+                <?php foreach ($finished_goods as $index => $good): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($good['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($good['product_name']); ?></td>
                         <td><?php echo htmlspecialchars($good['unit'] ?? 'N/A'); ?></td>
                         <td><?php echo number_format($good['stock'], 2, ',', '.'); ?></td>

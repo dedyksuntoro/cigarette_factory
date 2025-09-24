@@ -98,7 +98,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Permission</th>
                 <th>Deskripsi</th>
                 <th>Tanggal Dibuat</th>
@@ -111,9 +111,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="6" class="text-center">Tidak ada data permissions.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($permissions as $permission): ?>
+                <?php foreach ($permissions as $index => $permission): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($permission['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($permission['name']); ?></td>
                         <td><?php echo htmlspecialchars($permission['description']); ?></td>
                         <td><?php echo htmlspecialchars($permission['created_at']); ?></td>

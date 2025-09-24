@@ -98,7 +98,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Nama Role</th>
                 <th>Deskripsi</th>
                 <th>Tanggal Dibuat</th>
@@ -111,9 +111,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="5" class="text-center">Tidak ada data roles.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($roles as $rl): ?>
+                <?php foreach ($roles as $idx => $rl): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($rl['id']); ?></td>
+                        <td><?php echo ($offset + $idx + 1); ?></td>
                         <td><?php echo htmlspecialchars($rl['name']); ?></td>
                         <td><?php echo htmlspecialchars($rl['description']); ?></td>
                         <td><?php echo htmlspecialchars($rl['created_at']); ?></td>

@@ -125,7 +125,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Produk</th>
                 <th>Nomor Batch</th>
                 <th>Hasil</th>
@@ -140,9 +140,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="7" class="text-center">Tidak ada data kontrol kualitas.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($quality_controls as $qc): ?>
+                <?php foreach ($quality_controls as $index => $qc): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($qc['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($qc['product_name']); ?></td>
                         <td><?php echo htmlspecialchars($qc['batch_no']); ?></td>
                         <td><?php echo htmlspecialchars($qc['result'] == 'passed' ? 'Lulus' : 'Gagal'); ?></td>

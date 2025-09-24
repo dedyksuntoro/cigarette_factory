@@ -99,7 +99,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Deskripsi</th>
                 <th>Jumlah</th>
                 <th>Tanggal Pengeluaran</th>
@@ -113,9 +113,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="6" class="text-center">Tidak ada data pengeluaran.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($expenses as $expense): ?>
+                <?php foreach ($expenses as $index => $expense): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($expense['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($expense['description']); ?></td>
                         <td><?php echo number_format($expense['amount'], 2, ',', '.'); ?></td>
                         <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>

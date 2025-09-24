@@ -126,7 +126,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Produk</th>
                 <th>Jumlah</th>
                 <th>Tujuan</th>
@@ -141,9 +141,9 @@ require_once __DIR__ . '/../templates/header.php';
                     <td colspan="7" class="text-center">Tidak ada data distribusi.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($distributions as $distribution): ?>
+                <?php foreach ($distributions as $index => $distribution): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($distribution['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($distribution['product_name']); ?></td>
                         <td><?php echo htmlspecialchars($distribution['quantity']); ?></td>
                         <td><?php echo htmlspecialchars($distribution['destination']); ?></td>

@@ -126,7 +126,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Pembuat</th>
                 <th>Nama Rencana</th>
                 <th>Tanggal Rencana</th>
@@ -138,12 +138,12 @@ require_once __DIR__ . '/../templates/header.php';
         <tbody>
             <?php if (empty($plans)): ?>
                 <tr>
-                    <td colspan="6" class="text-center">Tidak ada data rencana produksi.</td>
+                    <td colspan="7" class="text-center">Tidak ada data rencana produksi.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($plans as $plan): ?>
+                <?php foreach ($plans as $index => $plan): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($plan['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($plan['username'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($plan['name'] ?? 'Tidak terkait'); ?></td>
                         <td><?php echo htmlspecialchars($plan['plan_date']); ?></td>

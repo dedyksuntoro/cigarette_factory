@@ -110,7 +110,7 @@ require_once __DIR__ . '/../templates/header.php';
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Tanggal Dibuat</th>
@@ -120,12 +120,12 @@ require_once __DIR__ . '/../templates/header.php';
         <tbody>
             <?php if (empty($users)): ?>
                 <tr>
-                    <td colspan="6" class="text-center">Tidak ada data pengguna.</td>
+                    <td colspan="5" class="text-center">Tidak ada data pengguna.</td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($users as $user): ?>
+                <?php foreach ($users as $index => $user): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($user['id']); ?></td>
+                        <td><?php echo ($offset + $index + 1); ?></td>
                         <td><?php echo htmlspecialchars($user['username']); ?></td>
                         <td><?php echo htmlspecialchars($user['email']); ?></td>
                         <td><?php echo htmlspecialchars($user['created_at']); ?></td>
