@@ -97,41 +97,49 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Kontrol Kualitas</h1>
+    <h1> Kontrol Kualitas</h1>
     <?php if (hasPermission($role, ['create_all', 'create_quality_controls'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/add.php" class="btn btn-success mb-3">Tambah Kontrol Kualitas</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4 col-sm-6">
-                <label for="product_id" class="form-label">Produk</label>
-                <select class="form-select" id="product_id" name="product_id">
-                    <option value="">Semua Produk</option>
-                    <?php foreach ($products as $product): ?>
-                        <option value="<?php echo $product['id']; ?>" <?php echo $filter_product_id == $product['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($product['product_name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="result" class="form-label">Hasil</label>
-                <select class="form-select" id="result" name="result">
-                    <option value="">Semua Hasil</option>
-                    <option value="passed" <?php echo $filter_result == 'passed' ? 'selected' : ''; ?>>Lulus</option>
-                    <option value="failed" <?php echo $filter_result == 'failed' ? 'selected' : ''; ?>>Gagal</option>
-                </select>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="batch_no" class="form-label">Nomor Batch</label>
-                <input type="text" class="form-control" id="batch_no" name="batch_no" value="<?php echo htmlspecialchars($filter_batch_no); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="product_id" class="form-label">Produk</label>
+                        <select class="form-select" id="product_id" name="product_id">
+                            <option value="">Semua Produk</option>
+                            <?php foreach ($products as $product): ?>
+                                <option value="<?php echo $product['id']; ?>" <?php echo $filter_product_id == $product['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($product['product_name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="result" class="form-label">Hasil</label>
+                        <select class="form-select" id="result" name="result">
+                            <option value="">Semua Hasil</option>
+                            <option value="passed" <?php echo $filter_result == 'passed' ? 'selected' : ''; ?>>Lulus</option>
+                            <option value="failed" <?php echo $filter_result == 'failed' ? 'selected' : ''; ?>>Gagal</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="batch_no" class="form-label">Nomor Batch</label>
+                        <input type="text" class="form-control" id="batch_no" name="batch_no" value="<?php echo htmlspecialchars($filter_batch_no); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Kontrol Kualitas -->
     <div class="table-responsive">

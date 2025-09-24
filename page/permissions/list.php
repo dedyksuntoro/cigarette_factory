@@ -84,28 +84,36 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Permissions</h1>
+    <h1>Permissions</h1>
     <?php if (hasPermission($role, ['create_all', 'create_permissions'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/add.php" class="btn btn-success mb-3">Tambah Permission</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4 col-sm-6">
-                <label for="izin" class="form-label">Permission</label>
-                <input type="text" class="form-control" id="izin" name="izin" value="<?php echo htmlspecialchars($filter_izin); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="created_date" class="form-label">Tanggal Dibuat</label>
-                <input type="date" class="form-control" id="created_date" name="created_date" value="<?php echo htmlspecialchars($filter_created_date); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="izin" class="form-label">Permission</label>
+                        <input type="text" class="form-control" id="izin" name="izin" value="<?php echo htmlspecialchars($filter_izin); ?>">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="created_date" class="form-label">Tanggal Dibuat</label>
+                        <input type="date" class="form-control" id="created_date" name="created_date" value="<?php echo htmlspecialchars($filter_created_date); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/permissions/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Permissions -->
     <div class="table-responsive">

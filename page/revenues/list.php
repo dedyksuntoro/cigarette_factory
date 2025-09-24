@@ -84,28 +84,36 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Pendapatan</h1>
+    <h1>Pendapatan</h1>
     <?php if (hasPermission($role, ['create_all', 'create_revenues'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/revenues/add.php" class="btn btn-success mb-3">Tambah Pendapatan</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4 col-sm-6">
-                <label for="description" class="form-label">Deskripsi</label>
-                <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($filter_description); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="revenue_date" class="form-label">Tanggal Pendapatan</label>
-                <input type="date" class="form-control" id="revenue_date" name="revenue_date" value="<?php echo htmlspecialchars($filter_revenue_date); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/revenues/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="description" class="form-label">Deskripsi</label>
+                        <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($filter_description); ?>">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="revenue_date" class="form-label">Tanggal Pendapatan</label>
+                        <input type="date" class="form-control" id="revenue_date" name="revenue_date" value="<?php echo htmlspecialchars($filter_revenue_date); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/revenues/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Pendapatan -->
     <div class="table-responsive">

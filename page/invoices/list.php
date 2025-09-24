@@ -97,41 +97,49 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Faktur</h1>
+    <h1>Faktur</h1>
     <?php if (hasPermission($role, ['create_all', 'create_invoices'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/invoices/add.php" class="btn btn-success mb-3">Tambah Faktur</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4 col-sm-6">
-                <label for="status" class="form-label">Status</label>
-                <select class="form-select" id="status" name="status">
-                    <option value="">Semua Status</option>
-                    <option value="unpaid" <?php echo $filter_status == 'unpaid' ? 'selected' : ''; ?>>Belum Dibayar</option>
-                    <option value="paid" <?php echo $filter_status == 'paid' ? 'selected' : ''; ?>>Sudah Dibayar</option>
-                </select>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="distribution_id" class="form-label">Distribusi</label>
-                <select class="form-select" id="distribution_id" name="distribution_id">
-                    <option value="">Semua Distribusi</option>
-                    <?php foreach ($distributions as $distribution): ?>
-                        <option value="<?php echo $distribution['id']; ?>" <?php echo $filter_distribution_id == $distribution['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($distribution['destination']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="created_at" class="form-label">Tanggal Dibuat</label>
-                <input type="date" class="form-control" id="created_at" name="created_at" value="<?php echo htmlspecialchars($filter_date); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/invoices/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">Semua Status</option>
+                            <option value="unpaid" <?php echo $filter_status == 'unpaid' ? 'selected' : ''; ?>>Belum Dibayar</option>
+                            <option value="paid" <?php echo $filter_status == 'paid' ? 'selected' : ''; ?>>Sudah Dibayar</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="distribution_id" class="form-label">Distribusi</label>
+                        <select class="form-select" id="distribution_id" name="distribution_id">
+                            <option value="">Semua Distribusi</option>
+                            <?php foreach ($distributions as $distribution): ?>
+                                <option value="<?php echo $distribution['id']; ?>" <?php echo $filter_distribution_id == $distribution['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($distribution['destination']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="created_at" class="form-label">Tanggal Dibuat</label>
+                        <input type="date" class="form-control" id="created_at" name="created_at" value="<?php echo htmlspecialchars($filter_date); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/invoices/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Faktur -->
     <div class="table-responsive">

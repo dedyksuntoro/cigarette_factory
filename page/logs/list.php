@@ -98,32 +98,40 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 
 <div class="container mt-4">
     <h1>Log Aktivitas</h1>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-3 col-sm-6">
-                <label for="start_date" class="form-label">Tanggal Awal</label>
-                <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($filter_start_date); ?>">
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="end_date" class="form-label">Tanggal Akhir</label>
-                <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($filter_end_date); ?>">
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($filter_username); ?>">
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="action" class="form-label">Aksi (Kata Kunci)</label>
-                <input type="text" class="form-control" id="action" name="action" value="<?php echo htmlspecialchars($filter_action); ?>">
-            </div>
-            <div class="col-md-3 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-6">
+                        <label for="start_date" class="form-label">Tanggal Awal</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($filter_start_date); ?>">
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="end_date" class="form-label">Tanggal Akhir</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($filter_end_date); ?>">
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($filter_username); ?>">
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="action" class="form-label">Aksi (Kata Kunci)</label>
+                        <input type="text" class="form-control" id="action" name="action" value="<?php echo htmlspecialchars($filter_action); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/logs/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Log -->
     <div class="table-responsive">

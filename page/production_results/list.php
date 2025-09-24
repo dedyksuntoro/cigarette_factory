@@ -99,28 +99,36 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
     <?php if (hasPermission($role, ['create_all', 'create_production_results'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/add.php" class="btn btn-success mb-3">Tambah Hasil Produksi</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4 col-sm-6">
-                <label for="plan_name" class="form-label">Nama Rencana</label>
-                <input type="text" class="form-control" id="plan_name" name="plan_name" value="<?php echo htmlspecialchars($filter_plan_name); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="actual_quantity" class="form-label">Jumlah Aktual</label>
-                <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" value="<?php echo htmlspecialchars($filter_actual_quantity); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <label for="efficiency" class="form-label">Efisiensi (%)</label>
-                <input type="number" step="0.01" class="form-control" id="efficiency" name="efficiency" value="<?php echo htmlspecialchars($filter_efficiency); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4 col-sm-6">
+                        <label for="plan_name" class="form-label">Nama Rencana</label>
+                        <input type="text" class="form-control" id="plan_name" name="plan_name" value="<?php echo htmlspecialchars($filter_plan_name); ?>">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="actual_quantity" class="form-label">Jumlah Aktual</label>
+                        <input type="number" class="form-control" id="actual_quantity" name="actual_quantity" value="<?php echo htmlspecialchars($filter_actual_quantity); ?>">
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <label for="efficiency" class="form-label">Efisiensi (%)</label>
+                        <input type="number" step="0.01" class="form-control" id="efficiency" name="efficiency" value="<?php echo htmlspecialchars($filter_efficiency); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_results/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Hasil Produksi -->
     <div class="table-responsive">

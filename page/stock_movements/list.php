@@ -111,50 +111,58 @@ $start_page = max(1, min($start_page, $total_pages - $max_visible_pages + 1));
 ?>
 
 <div class="container mt-4">
-    <h1>Manajemen Pergerakan Stok</h1>
+    <h1>Pergerakan Stok</h1>
     <?php if (hasPermission($role, ['create_all', 'create_stock_movements'])): ?>
         <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/add.php" class="btn btn-success mb-3">Tambah Pergerakan Stok</a>
     <?php endif; ?>
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#collapsePencarian" role="button" aria-expanded="false" aria-controls="collapsePencarian">
+        Filter Data
+    </a>
 
     <!-- Form Filter -->
-    <form method="GET" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-3 col-sm-6">
-                <label for="type" class="form-label">Tipe</label>
-                <select class="form-select" id="type" name="type">
-                    <option value="">Semua Tipe</option>
-                    <option value="in" <?php echo $filter_type == 'in' ? 'selected' : ''; ?>>Masuk</option>
-                    <option value="out" <?php echo $filter_type == 'out' ? 'selected' : ''; ?>>Keluar</option>
-                </select>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="material_id" class="form-label">Bahan Baku</label>
-                <select class="form-select" id="material_id" name="material_id">
-                    <option value="">Semua Bahan Baku</option>
-                    <?php foreach ($materials as $material): ?>
-                        <option value="<?php echo $material['id']; ?>" <?php echo $filter_material == $material['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($material['name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="finished_good_id" class="form-label">Barang Jadi</label>
-                <select class="form-select" id="finished_good_id" name="finished_good_id">
-                    <option value="">Semua Barang Jadi</option>
-                    <?php foreach ($finished_goods as $fg): ?>
-                        <option value="<?php echo $fg['id']; ?>" <?php echo $filter_finished_good == $fg['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($fg['product_name']); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <label for="movement_date" class="form-label">Tanggal Pergerakan</label>
-                <input type="date" class="form-control" id="movement_date" name="movement_date" value="<?php echo htmlspecialchars($filter_date); ?>">
-            </div>
-            <div class="col-md-4 col-sm-6 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Filter</button>
-                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/list.php" class="btn btn-secondary">Reset</a>
-            </div>
+    <div class="collapse pb-3" id="collapsePencarian">
+        <div class="card card-body shadow">
+            <form method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-6">
+                        <label for="type" class="form-label">Tipe</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">Semua Tipe</option>
+                            <option value="in" <?php echo $filter_type == 'in' ? 'selected' : ''; ?>>Masuk</option>
+                            <option value="out" <?php echo $filter_type == 'out' ? 'selected' : ''; ?>>Keluar</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="material_id" class="form-label">Bahan Baku</label>
+                        <select class="form-select" id="material_id" name="material_id">
+                            <option value="">Semua Bahan Baku</option>
+                            <?php foreach ($materials as $material): ?>
+                                <option value="<?php echo $material['id']; ?>" <?php echo $filter_material == $material['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($material['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="finished_good_id" class="form-label">Barang Jadi</label>
+                        <select class="form-select" id="finished_good_id" name="finished_good_id">
+                            <option value="">Semua Barang Jadi</option>
+                            <?php foreach ($finished_goods as $fg): ?>
+                                <option value="<?php echo $fg['id']; ?>" <?php echo $filter_finished_good == $fg['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($fg['product_name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="movement_date" class="form-label">Tanggal Pergerakan</label>
+                        <input type="date" class="form-control" id="movement_date" name="movement_date" value="<?php echo htmlspecialchars($filter_date); ?>">
+                    </div>
+                    <hr />
+                    <div class="col-md-4 col-sm-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/list.php" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <!-- Tabel Pergerakan Stok -->
     <div class="table-responsive">
