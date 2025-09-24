@@ -123,6 +123,8 @@ require_once __DIR__ . '/../templates/header.php';
 
     <!-- Tabel Kontrol Kualitas -->
     <table class="table table-bordered">
+        <div class="table-responsive">
+            <table class="table table-bordered">
         <thead>
             <tr>
                 <th>No</th>
@@ -160,6 +162,8 @@ require_once __DIR__ . '/../templates/header.php';
                 <?php endforeach; ?>
             <?php endif; ?>
         </tbody>
+            </table>
+        </div>
     </table>
 
     <!-- Paginasi -->

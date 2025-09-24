@@ -96,43 +96,46 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Pengeluaran -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Deskripsi</th>
-                <th>Jumlah</th>
-                <th>Tanggal Pengeluaran</th>
-                <th>Dibuat Pada</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($expenses)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="6" class="text-center">Tidak ada data pengeluaran.</td>
+                    <th>No</th>
+                    <th>Deskripsi</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal Pengeluaran</th>
+                    <th>Dibuat Pada</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($expenses as $index => $expense): ?>
+            </thead>
+            <tbody>
+
+                <?php if (empty($expenses)): ?>
                     <tr>
-                        <td><?php echo ($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($expense['description']); ?></td>
-                        <td><?php echo number_format($expense['amount'], 2, ',', '.'); ?></td>
-                        <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
-                        <td><?php echo htmlspecialchars($expense['created_at']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_expanses'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_expanses'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="6" class="text-center">Tidak ada data pengeluaran.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($expenses as $index => $expense): ?>
+                        <tr>
+                            <td><?php echo ($offset + $index + 1); ?></td>
+                            <td><?php echo htmlspecialchars($expense['description']); ?></td>
+                            <td><?php echo number_format($expense['amount'], 2, ',', '.'); ?></td>
+                            <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
+                            <td><?php echo htmlspecialchars($expense['created_at']); ?></td>
+                            <td>
+                                <?php if (hasPermission($role, ['update_all', 'update_expanses'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <?php endif; ?>
+                                <?php if (hasPermission($role, ['delete_all', 'delete_expanses'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

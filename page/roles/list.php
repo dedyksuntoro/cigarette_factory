@@ -95,7 +95,8 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Roles -->
-    <table class="table table-bordered">
+    <div class="table-responsive">
+        <table class="table table-bordered">
         <thead>
             <tr>
                 <th>No</th>
@@ -129,7 +130,8 @@ require_once __DIR__ . '/../templates/header.php';
                 <?php endforeach; ?>
             <?php endif; ?>
         </tbody>
-    </table>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

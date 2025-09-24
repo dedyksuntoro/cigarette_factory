@@ -123,7 +123,8 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Distribusi -->
-    <table class="table table-bordered">
+    <div class="table-responsive">
+        <table class="table table-bordered">
         <thead>
             <tr>
                 <th>No</th>
@@ -138,6 +139,8 @@ require_once __DIR__ . '/../templates/header.php';
         <tbody>
             <?php if (empty($distributions)): ?>
                 <tr>
+        </table>
+    </div>
                     <td colspan="7" class="text-center">Tidak ada data distribusi.</td>
                 </tr>
             <?php else: ?>

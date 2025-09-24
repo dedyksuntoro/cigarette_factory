@@ -120,43 +120,46 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Barang Jadi -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama Produk</th>
-                <th>Unit</th>
-                <th>Stok</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($finished_goods)): ?>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="6" class="text-center">Tidak ada data barang jadi.</td>
+                    <th>No</th>
+                    <th>Nama Produk</th>
+                    <th>Unit</th>
+                    <th>Stok</th>
+                    <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($finished_goods as $index => $good): ?>
+            </thead>
+            <tbody>
+                <?php if (empty($finished_goods)): ?>
                     <tr>
-                        <td><?php echo ($offset + $index + 1); ?></td>
-                        <td><?php echo htmlspecialchars($good['product_name']); ?></td>
-                        <td><?php echo htmlspecialchars($good['unit'] ?? 'N/A'); ?></td>
-                        <td><?php echo number_format($good['stock'], 2, ',', '.'); ?></td>
-                        <td><?php echo htmlspecialchars($good['created_at']); ?></td>
-                        <td>
-                            <?php if (hasPermission($role, ['update_all', 'update_finished_goods'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/edit.php?id=<?php echo $good['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <?php endif; ?>
-                            <?php if (hasPermission($role, ['delete_all', 'delete_finished_goods'])): ?>
-                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/delete.php?id=<?php echo $good['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus barang jadi ini?')">Hapus</a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="6" class="text-center">Tidak ada data barang jadi.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($finished_goods as $index => $good): ?>
+                        <tr>
+                            <td><?php echo ($offset + $index + 1); ?></td>
+                            <td><?php echo htmlspecialchars($good['product_name']); ?></td>
+                            <td><?php echo htmlspecialchars($good['unit'] ?? 'N/A'); ?></td>
+                            <td><?php echo number_format($good['stock'], 2, ',', '.'); ?></td>
+                            <td><?php echo htmlspecialchars($good['created_at']); ?></td>
+                            <td>
+                                <?php if (hasPermission($role, ['update_all', 'update_finished_goods'])): ?>
+
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/edit.php?id=<?php echo $good['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <?php endif; ?>
+                                <?php if (hasPermission($role, ['delete_all', 'delete_finished_goods'])): ?>
+                                    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/finished_goods/delete.php?id=<?php echo $good['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus barang jadi ini?')">Hapus</a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginasi -->
     <nav aria-label="Pagination">

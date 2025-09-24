@@ -122,7 +122,8 @@ require_once __DIR__ . '/../templates/header.php';
     </form>
 
     <!-- Tabel Faktur -->
-    <table class="table table-bordered">
+    <div class="table-responsive">
+        <table class="table table-bordered">
         <thead>
             <tr>
                 <th>No</th>
@@ -138,6 +139,8 @@ require_once __DIR__ . '/../templates/header.php';
                 <tr>
                     <td colspan="6" class="text-center">Tidak ada data faktur.</td>
                 </tr>
+        </table>
+    </div>
             <?php else: ?>
                 <?php foreach ($invoices as $index => $invoice): ?>
                     <tr>
