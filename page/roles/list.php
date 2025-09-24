@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_roles', 'read_roles', 'update_roles', 'delete_roles'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
@@ -74,8 +74,10 @@ require_once __DIR__ . '/../templates/header.php';
 
 <div class="container mt-4">
     <h1>Manajemen Roles</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/add.php" class="btn btn-success mb-3">Tambah Role</a>
-    
+    <?php if (hasPermission($role, ['create_all', 'create_roles'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/add.php" class="btn btn-success mb-3">Tambah Role</a>
+    <?php endif; ?>
+
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
@@ -105,17 +107,23 @@ require_once __DIR__ . '/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($roles)): ?>
-                <tr><td colspan="5" class="text-center">Tidak ada data roles.</td></tr>
+                <tr>
+                    <td colspan="5" class="text-center">Tidak ada data roles.</td>
+                </tr>
             <?php else: ?>
-                <?php foreach ($roles as $role): ?>
+                <?php foreach ($roles as $rl): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($role['id']); ?></td>
-                        <td><?php echo htmlspecialchars($role['name']); ?></td>
-                        <td><?php echo htmlspecialchars($role['description']); ?></td>
-                        <td><?php echo htmlspecialchars($role['created_at']); ?></td>
+                        <td><?php echo htmlspecialchars($rl['id']); ?></td>
+                        <td><?php echo htmlspecialchars($rl['name']); ?></td>
+                        <td><?php echo htmlspecialchars($rl['description']); ?></td>
+                        <td><?php echo htmlspecialchars($rl['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/edit.php?id=<?php echo $role['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/delete.php?id=<?php echo $role['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_roles'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/edit.php?id=<?php echo $rl['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_roles'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/roles/delete.php?id=<?php echo $rl['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus role ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -138,4 +146,5 @@ require_once __DIR__ . '/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_employees', 'read_employees', 'update_employees', 'delete_employees'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
@@ -87,13 +87,15 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_employees = $stmt->fetchColumn();
 $total_pages = ceil($total_employees / $limit);
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Karyawan</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/add.php" class="btn btn-success mb-3">Tambah Karyawan</a>
-    
+    <?php if (hasPermission($role, ['create_all', 'create_employees'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/add.php" class="btn btn-success mb-3">Tambah Karyawan</a>
+    <?php endif; ?>
+
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
@@ -139,7 +141,9 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($employees)): ?>
-                <tr><td colspan="8" class="text-center">Tidak ada data karyawan.</td></tr>
+                <tr>
+                    <td colspan="8" class="text-center">Tidak ada data karyawan.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($employees as $employee): ?>
                     <tr>
@@ -151,8 +155,12 @@ require_once __DIR__.'/../templates/header.php';
                         <td><?php echo number_format($employee['salary'], 2, ',', '.'); ?></td>
                         <td><?php echo htmlspecialchars($employee['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_employees'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/edit.php?id=<?php echo $employee['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_employees'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/employees/delete.php?id=<?php echo $employee['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus karyawan ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -175,4 +183,5 @@ require_once __DIR__.'/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

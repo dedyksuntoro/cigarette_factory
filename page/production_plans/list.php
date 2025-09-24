@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_production_plans', 'read_production_plans', 'update_production_plans', 'delete_production_plans'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
@@ -89,13 +89,15 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_plans = $stmt->fetchColumn();
 $total_pages = ceil($total_plans / $limit);
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Perencanaan Produksi</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/add.php" class="btn btn-success mb-3">Tambah Rencana Produksi</a>
-    
+    <?php if (hasPermission($role, ['create_all', 'create_production_plans'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/add.php" class="btn btn-success mb-3">Tambah Rencana Produksi</a>
+    <?php endif; ?>
+
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
@@ -135,7 +137,9 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($plans)): ?>
-                <tr><td colspan="6" class="text-center">Tidak ada data rencana produksi.</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center">Tidak ada data rencana produksi.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($plans as $plan): ?>
                     <tr>
@@ -146,8 +150,12 @@ require_once __DIR__.'/../templates/header.php';
                         <td><?php echo htmlspecialchars($plan['target_quantity']); ?></td>
                         <td><?php echo htmlspecialchars($plan['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/edit.php?id=<?php echo $plan['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/delete.php?id=<?php echo $plan['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus rencana ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_production_plans'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/edit.php?id=<?php echo $plan['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_production_plans'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/production_plans/delete.php?id=<?php echo $plan['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus rencana ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -170,4 +178,5 @@ require_once __DIR__.'/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

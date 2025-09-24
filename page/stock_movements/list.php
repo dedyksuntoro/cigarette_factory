@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_stock_movements', 'read_stock_movements', 'update_stock_movements', 'delete_stock_movements'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
@@ -92,13 +92,15 @@ $total_pages = ceil($total_movements / $limit);
 // Ambil data untuk dropdown filter
 $materials = $pdo->query("SELECT id, name FROM materials")->fetchAll(PDO::FETCH_ASSOC);
 $finished_goods = $pdo->query("SELECT id, product_name FROM finished_goods")->fetchAll(PDO::FETCH_ASSOC);
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Pergerakan Stok</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/add.php" class="btn btn-success mb-3">Tambah Pergerakan Stok</a>
-    
+    <?php if (hasPermission($role, ['create_all', 'create_stock_movements'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/add.php" class="btn btn-success mb-3">Tambah Pergerakan Stok</a>
+    <?php endif; ?>
+
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
@@ -152,7 +154,9 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($stock_movements)): ?>
-                <tr><td colspan="7" class="text-center">Tidak ada data pergerakan stok.</td></tr>
+                <tr>
+                    <td colspan="7" class="text-center">Tidak ada data pergerakan stok.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($stock_movements as $movement): ?>
                     <tr>
@@ -163,8 +167,12 @@ require_once __DIR__.'/../templates/header.php';
                         <td><?php echo htmlspecialchars($movement['quantity']); ?></td>
                         <td><?php echo htmlspecialchars($movement['movement_date']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/edit.php?id=<?php echo $movement['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/delete.php?id=<?php echo $movement['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pergerakan stok ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_stock_movements'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/edit.php?id=<?php echo $movement['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_stock_movements'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/stock_movements/delete.php?id=<?php echo $movement['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pergerakan stok ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -187,4 +195,5 @@ require_once __DIR__.'/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

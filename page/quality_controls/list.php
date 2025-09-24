@@ -88,7 +88,9 @@ require_once __DIR__ . '/../templates/header.php';
 
 <div class="container mt-4">
     <h1>Manajemen Kontrol Kualitas</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/add.php" class="btn btn-success mb-3">Tambah Kontrol Kualitas</a>
+    <?php if (hasPermission($role, ['create_all', 'create_quality_controls'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/add.php" class="btn btn-success mb-3">Tambah Kontrol Kualitas</a>
+    <?php endif; ?>
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
@@ -134,7 +136,9 @@ require_once __DIR__ . '/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($quality_controls)): ?>
-                <tr><td colspan="7" class="text-center">Tidak ada data kontrol kualitas.</td></tr>
+                <tr>
+                    <td colspan="7" class="text-center">Tidak ada data kontrol kualitas.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($quality_controls as $qc): ?>
                     <tr>
@@ -145,8 +149,12 @@ require_once __DIR__ . '/../templates/header.php';
                         <td><?php echo htmlspecialchars($qc['notes'] ?: '-'); ?></td>
                         <td><?php echo htmlspecialchars($qc['qc_date']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/edit.php?id=<?php echo $qc['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/delete.php?id=<?php echo $qc['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data kontrol kualitas ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_quality_controls'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/edit.php?id=<?php echo $qc['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_quality_controls'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/quality_controls/delete.php?id=<?php echo $qc['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data kontrol kualitas ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -169,4 +177,5 @@ require_once __DIR__ . '/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once __DIR__.'/../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'read_all', 'update_all', 'delete_all', 'create_users', 'read_users', 'update_users', 'delete_users'])) {
-    header('Location: '.$_ENV['BASE_URL'].'/page/auth/login.php');
+    header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
 
@@ -77,13 +77,15 @@ $stmt = $pdo->prepare($count_query);
 $stmt->execute($count_params);
 $total_users = $stmt->fetchColumn();
 $total_pages = ceil($total_users / $limit);
-require_once __DIR__.'/../templates/header.php';
+require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
     <h1>Manajemen Pengguna</h1>
-    <a href="add.php" class="btn btn-success mb-3">Tambah Pengguna</a>
-    
+    <?php if (hasPermission($role, ['create_all', 'create_users'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/add.php" class="btn btn-success mb-3">Tambah Pengguna</a>
+    <?php endif; ?>
+
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
         <div class="row">
@@ -117,7 +119,9 @@ require_once __DIR__.'/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($users)): ?>
-                <tr><td colspan="6" class="text-center">Tidak ada data pengguna.</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center">Tidak ada data pengguna.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($users as $user): ?>
                     <tr>
@@ -126,8 +130,12 @@ require_once __DIR__.'/../templates/header.php';
                         <td><?php echo htmlspecialchars($user['email']); ?></td>
                         <td><?php echo htmlspecialchars($user['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/edit.php?id=<?php echo $user['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/delete.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_users'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/edit.php?id=<?php echo $user['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_users'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/users/delete.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengguna ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -150,4 +158,5 @@ require_once __DIR__.'/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

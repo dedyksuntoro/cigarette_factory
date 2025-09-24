@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['update_all', 'update_roles'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['update_all', 'update_roles'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }
@@ -17,9 +17,9 @@ $role_id = $_GET['id'];
 // Ambil data role
 $stmt = $pdo->prepare("SELECT id, name, description FROM roles WHERE id = ?");
 $stmt->execute([$role_id]);
-$role = $stmt->fetch(PDO::FETCH_ASSOC);
+$roles = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$role) {
+if (!$roles) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/roles/list.php');
     exit();
 }
@@ -71,22 +71,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+// Sertakan header setelah logika selesai
 require_once __DIR__ . '/../templates/header.php';
 ?>
 
 <div class="container mt-4">
-    <h1>Edit Role: <?php echo htmlspecialchars($role['name']); ?></h1>
+    <h1>Edit Role: <?php echo htmlspecialchars($roles['name']); ?></h1>
     <?php if (isset($error)) { ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
     <?php } ?>
     <form method="POST">
         <div class="mb-3">
             <label for="name" class="form-label">Nama Role</label>
-            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($role['name']); ?>" required>
+            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($roles['name']); ?>" required>
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Deskripsi</label>
-            <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($role['description']); ?>">
+            <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($roles['description']); ?>">
         </div>
         <div class="mb-3">
             <label class="form-label">Permissions</label>

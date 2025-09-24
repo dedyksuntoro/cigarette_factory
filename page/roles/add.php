@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config/db.php';
 
-if (!isset($_SESSION['user_id']) || !hasPermission($_SESSION['role'], ['create_all', 'create_roles'])) {
+if (!isset($_SESSION['user_id']) || !hasPermission($role, ['create_all', 'create_roles'])) {
     header('Location: ' . $_ENV['BASE_URL'] . '/page/auth/login.php');
     exit();
 }

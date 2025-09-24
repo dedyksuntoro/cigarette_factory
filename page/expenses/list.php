@@ -75,7 +75,9 @@ require_once __DIR__ . '/../templates/header.php';
 
 <div class="container mt-4">
     <h1>Manajemen Pengeluaran</h1>
-    <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/add.php" class="btn btn-success mb-3">Tambah Pengeluaran</a>
+    <?php if (hasPermission($role, ['create_all', 'create_expanses'])): ?>
+        <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/add.php" class="btn btn-success mb-3">Tambah Pengeluaran</a>
+    <?php endif; ?>
 
     <!-- Form Filter -->
     <form method="GET" class="mb-4">
@@ -107,7 +109,9 @@ require_once __DIR__ . '/../templates/header.php';
         </thead>
         <tbody>
             <?php if (empty($expenses)): ?>
-                <tr><td colspan="6" class="text-center">Tidak ada data pengeluaran.</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center">Tidak ada data pengeluaran.</td>
+                </tr>
             <?php else: ?>
                 <?php foreach ($expenses as $expense): ?>
                     <tr>
@@ -117,8 +121,12 @@ require_once __DIR__ . '/../templates/header.php';
                         <td><?php echo htmlspecialchars($expense['expense_date']); ?></td>
                         <td><?php echo htmlspecialchars($expense['created_at']); ?></td>
                         <td>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
+                            <?php if (hasPermission($role, ['update_all', 'update_expanses'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/edit.php?id=<?php echo $expense['id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                            <?php endif; ?>
+                            <?php if (hasPermission($role, ['delete_all', 'delete_expanses'])): ?>
+                                <a href="<?php echo $_ENV['BASE_URL']; ?>/page/expenses/delete.php?id=<?php echo $expense['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus pengeluaran ini?')">Hapus</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -141,4 +149,5 @@ require_once __DIR__ . '/../templates/header.php';
 <!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
